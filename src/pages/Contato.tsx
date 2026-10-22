@@ -1,11 +1,21 @@
 import { Footer } from '../components/ui/Footer'
+import {
+  ENDERECO, ENDERECO_CURTO, CIDADE, MAPS_URL, MAPS_EMBED_URL,
+  INSTAGRAM_URL, INSTAGRAM_HANDLE, WHATSAPP_URL, YOUTUBE_URL,
+} from '../lib/links'
 
 export default function Contato() {
   const infos = [
-    { icon: '📍', label: 'Local dos Eventos', val: "Praça Central — Santa Bárbara d'Oeste, SP" },
-    { icon: '📸', label: 'Instagram', val: '@batalhadoceu.sbo' },
-    { icon: '💬', label: 'WhatsApp', val: '(19) 99999-0000' },
-    { icon: '✉', label: 'E-mail', val: 'contato@batalhadoceu.com.br' },
+    { icon: '📍', label: 'Local dos Eventos', val: ENDERECO, href: MAPS_URL },
+    { icon: '📸', label: 'Instagram', val: INSTAGRAM_HANDLE, href: INSTAGRAM_URL },
+    { icon: '💬', label: 'WhatsApp', val: 'Chamar no WhatsApp', href: WHATSAPP_URL },
+    { icon: '▶', label: 'YouTube', val: 'youtube.com/c/batalhadoceu', href: YOUTUBE_URL },
+  ]
+
+  const redes = [
+    { label: '📸 Instagram', href: INSTAGRAM_URL },
+    { label: '▶ YouTube', href: YOUTUBE_URL },
+    { label: '💬 WhatsApp', href: WHATSAPP_URL },
   ]
 
   return (
@@ -20,9 +30,11 @@ export default function Contato() {
               {infos.map(i => (
                 <div key={i.label} className="detail-item">
                   <div className="detail-icon">{i.icon}</div>
-                  <div>
+                  <div style={{ minWidth: 0 }}>
                     <div className="detail-label">{i.label}</div>
-                    <div className="detail-val">{i.val}</div>
+                    <div className="detail-val">
+                      <a href={i.href} target="_blank" rel="noopener noreferrer" className="detail-link">{i.val}</a>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -30,23 +42,27 @@ export default function Contato() {
               <div style={{ marginTop: '1.5rem' }}>
                 <div className="sec-label" style={{ marginBottom: '.75rem' }}>Redes Sociais</div>
                 <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
-                  {['📸 Instagram', '▶ YouTube', '🎵 TikTok'].map(r => (
-                    <button key={r} className="btn btn-o btn-sm">{r}</button>
+                  {redes.map(r => (
+                    <a key={r.label} href={r.href} target="_blank" rel="noopener noreferrer" className="btn btn-o btn-sm">{r.label}</a>
                   ))}
                 </div>
               </div>
             </div>
 
-            <div style={{
-              background: 'var(--P4)', border: '1px solid var(--B)', minHeight: 280,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexDirection: 'column', gap: '.75rem',
-            }}>
-              <div style={{ fontSize: '2.5rem', opacity: .2 }}>🗺</div>
-              <p style={{ fontFamily: 'var(--FC)', fontSize: '.8rem', color: 'var(--MU)', textTransform: 'uppercase', letterSpacing: '.1em', textAlign: 'center' }}>
-                Santa Bárbara d'Oeste — SP<br />
-                <span style={{ color: 'var(--MU2)', fontSize: '.7rem' }}>Google Maps em breve</span>
-              </p>
+            <div>
+              <div className="map-box">
+                <iframe
+                  title={`Mapa — ${ENDERECO_CURTO}`}
+                  src={MAPS_EMBED_URL}
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                />
+              </div>
+              <div style={{ marginTop: '.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap' }}>
+                <span style={{ fontFamily: 'var(--FC)', fontSize: '.78rem', color: 'var(--MU)', textTransform: 'uppercase', letterSpacing: '.08em' }}>{CIDADE}</span>
+                <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="btn btn-y btn-sm">Como chegar</a>
+              </div>
             </div>
           </div>
         </div>
