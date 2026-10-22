@@ -198,7 +198,7 @@ function SeedModal({ participants, getMC, slotCount, onConfirm, onCancel }: Seed
           <button className="modal-close" onClick={onCancel}>✕</button>
         </div>
         <p style={{ fontFamily: 'var(--FC)', fontSize: '.78rem', color: 'var(--MU)', marginBottom: '1.2rem', lineHeight: 1.6 }}>Slot 1 vs 2, Slot 3 vs 4, e assim por diante.</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+        <div className="split-2" style={{ gap: '1.5rem' }}>
           <div>
             <div style={{ fontFamily: 'var(--FC)', fontSize: '.62rem', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--MU)', marginBottom: '.6rem' }}>Slots</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '.3rem' }}>
@@ -461,7 +461,7 @@ export default function AdminBracket() {
             <summary style={{ fontFamily: 'var(--FC)', fontSize: '.72rem', letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--MU)', cursor: 'pointer', userSelect: 'none' }}>
               📋 Tabela de Pontuação
             </summary>
-            <div style={{ marginTop: '.75rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '.3rem .75rem' }}>
+            <div style={{ marginTop: '.75rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '.3rem .75rem' }}>
               {[
                 ['+3', 'Vencer por 2×0'],
                 ['+5', 'Vencer top 3 do ranking'],

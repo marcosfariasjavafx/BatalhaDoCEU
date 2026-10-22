@@ -32,14 +32,14 @@ export default function MCPerfil() {
 
   return (
     <div className="wrap">
-      <div style={{ padding: '3.5rem 2rem', maxWidth: 880, margin: '0 auto' }}>
+      <div className="page-wrap" style={{ maxWidth: 880 }}>
         <button className="btn btn-o btn-sm" style={{ marginBottom: '2rem' }} onClick={() => { nav('/mcs'); window.scrollTo(0, 0) }}>
           ← Voltar
         </button>
 
         <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'flex-start', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
           <MCAvatar id={mc.id} nome={mc.nome} fotoUrl={mc.foto_url} size={150} />
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: '1 1 260px', minWidth: 0 }}>
             <div style={{ fontFamily: 'var(--FC)', fontSize: '.68rem', fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: 'var(--Y)', marginBottom: '.4rem' }}>
               #{pos} no Ranking
             </div>

@@ -106,7 +106,7 @@ export default function AdminEdicoes() {
         : (
           <div className="grid-1px">
             {edicoes.map(ed => (
-              <div key={ed.id} style={{ background: 'var(--P3)', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: '1rem', padding: '.85rem 1.2rem' }}>
+              <div key={ed.id} className="admin-row admin-row-ed">
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '.6rem', marginBottom: '.2rem' }}>
                     <span className={`status-pill ${statusClass(ed.status)}`} style={{ fontSize: '.55rem' }}>{statusLabel(ed.status)}</span>
@@ -117,7 +117,7 @@ export default function AdminEdicoes() {
                     {ed.campeao && ` · 🏆 ${(ed.campeao as any).nome}`}
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '.5rem' }}>
+                <div className="admin-row-actions">
                   <button className="btn btn-ghost btn-sm" onClick={() => openEdit(ed)}>Editar</button>
                   <button className="btn btn-danger btn-sm" onClick={() => handleDelete(ed.id)}>Excluir</button>
                 </div>

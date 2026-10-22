@@ -32,7 +32,7 @@ export default function Dashboard() {
       <div className="admin-panel-title">Dashboard</div>
 
       {/* Stats */}
-      <div className="grid-1px" style={{ gridTemplateColumns: 'repeat(3,1fr)', marginBottom: '2rem' }}>
+      <div className="stats-grid">
         {[
           { lbl: 'MCs Cadastrados', val: stats.mcs },
           { lbl: 'Edições', val: stats.edicoes },
@@ -58,7 +58,7 @@ export default function Dashboard() {
       )}
 
       {/* Atalhos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+      <div className="shortcuts-grid">
         {atalhos.map(a => (
           <button
             key={a.path}

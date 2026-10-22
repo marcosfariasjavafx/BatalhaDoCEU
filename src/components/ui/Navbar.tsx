@@ -36,7 +36,14 @@ export function Navbar() {
         </ul>
         <div className="nav-right">
           <button id="nav-admin-btn" onClick={() => go('/admin')}>⚙ Admin</button>
-          <button className="nav-hamburger" onClick={() => setOpen(!open)}>☰</button>
+          <button
+            className="nav-hamburger"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={open}
+          >
+            {open ? '✕' : '☰'}
+          </button>
         </div>
       </nav>
 

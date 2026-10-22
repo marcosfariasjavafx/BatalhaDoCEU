@@ -94,7 +94,7 @@ export default function AdminMCs() {
         : (
           <div className="grid-1px">
             {mcs.map(mc => (
-              <div key={mc.id} style={{ background: 'var(--P3)', display: 'grid', gridTemplateColumns: '44px 1fr auto', alignItems: 'center', gap: '1rem', padding: '.8rem 1.2rem' }}>
+              <div key={mc.id} className="admin-row admin-row-mc">
                 <MCAvatar id={mc.id} nome={mc.nome} fotoUrl={mc.foto_url} size={44} />
                 <div>
                   <div style={{ fontFamily: 'var(--FC)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em' }}>{mc.nome}</div>
@@ -102,7 +102,7 @@ export default function AdminMCs() {
                     {mc.cidade ?? '—'} · {mc.pontos} pts · {mc.titulos} título(s)
                   </div>
                 </div>
-                <div style={{ display: 'flex', gap: '.5rem' }}>
+                <div className="admin-row-actions">
                   <button className="btn btn-ghost btn-sm" onClick={() => openEdit(mc)}>Editar</button>
                   <button className="btn btn-danger btn-sm" onClick={() => handleDelete(mc.id)}>Excluir</button>
                 </div>

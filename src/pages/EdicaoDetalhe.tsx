@@ -41,7 +41,7 @@ export default function EdicaoDetalhe() {
 
   return (
     <div className="wrap">
-      <div style={{ padding: '3.5rem 2rem', maxWidth: 900, margin: '0 auto' }}>
+      <div className="page-wrap">
         <button className="btn btn-o btn-sm" style={{ marginBottom: '2rem' }} onClick={() => { nav('/edicoes'); window.scrollTo(0, 0) }}>
           ← Voltar
         </button>
@@ -58,7 +58,7 @@ export default function EdicaoDetalhe() {
           </div>
         )}
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
+        <div className="split-2" style={{ marginBottom: '2.5rem' }}>
           <div>
             {ed.data && <div className="detail-item"><div className="detail-icon">📅</div><div><div className="detail-label">Data</div><div className="detail-val">{fmtData(ed.data)}</div></div></div>}
             {ed.horario && <div className="detail-item"><div className="detail-icon">⏰</div><div><div className="detail-label">Horário</div><div className="detail-val">{ed.horario}</div></div></div>}

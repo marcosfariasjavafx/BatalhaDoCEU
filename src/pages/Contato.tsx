@@ -15,7 +15,7 @@ export default function Contato() {
           <div className="sec-label">Fale Conosco</div>
           <div className="sec-title">Contato &<br />Localização</div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem' }}>
+          <div className="split-2 gap-lg">
             <div>
               {infos.map(i => (
                 <div key={i.label} className="detail-item">

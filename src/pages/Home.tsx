@@ -97,7 +97,7 @@ export default function Home() {
           <div className="sec-label">Em Destaque</div>
           <div className="sec-title">Próxima Edição</div>
           {nextEd ? (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', border: '1px solid var(--B)', maxWidth: 820 }}>
+            <div className="next-ed-card">
               <div style={{ background: 'var(--P4)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', minHeight: 200 }}>
                 {nextEd.banner_url
                   ? <img src={nextEd.banner_url} alt="" style={{ width: '100%', height: 'auto', display: 'block' }} />
