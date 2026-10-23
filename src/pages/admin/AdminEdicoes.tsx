@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase'
 import { uploadFile, compressImage, fmtData, statusClass, statusLabel } from '../../lib/utils'
 import { useToast } from '../../hooks/useToast'
 import { FORMATOS, formatoLabel, ehEquipe, equipeCampea } from '../../lib/equipes'
+import AdminEventos from './AdminEventos'
 import type { Edicao, EdicaoStatus, Formato, MC } from '../../types'
 
 const EMPTY = {
@@ -23,6 +24,7 @@ export default function AdminEdicoes() {
   const [form, setForm] = useState({ ...EMPTY })
   const [editId, setEditId] = useState<string | null>(null)
   const [origFormato, setOrigFormato] = useState<Formato>('solo')
+  const [novoEventoSignal, setNovoEventoSignal] = useState(0)
   const [saving, setSaving] = useState(false)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [bannerFile, setBannerFile] = useState<File | null>(null)
@@ -103,10 +105,15 @@ export default function AdminEdicoes() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <div className="admin-panel-title" style={{ marginBottom: 0 }}>Edições</div>
-        <button className="btn btn-y btn-sm" onClick={openNew}>+ Nova Edição</button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '.75rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+        <div className="admin-panel-title" style={{ marginBottom: 0 }}>Edições / Eventos</div>
+        <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
+          <button className="btn btn-y btn-sm" onClick={openNew}>+ Nova Edição</button>
+          <button className="btn btn-o btn-sm" onClick={() => setNovoEventoSignal(n => n + 1)}>+ Novo Evento</button>
+        </div>
       </div>
+
+      <div className="sec-label" style={{ marginBottom: '.75rem' }}>Edições de batalha</div>
 
       {loading
         ? <div className="aviso">Carregando...</div>
@@ -225,6 +232,9 @@ export default function AdminEdicoes() {
           </div>
         </div>
       )}
+
+      {/* EVENTOS (show, breakdance, grafite...) */}
+      <AdminEventos novoSignal={novoEventoSignal} />
     </div>
   )
 }

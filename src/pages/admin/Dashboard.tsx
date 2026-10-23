@@ -22,7 +22,7 @@ export default function Dashboard() {
 
   const atalhos = [
     { icon: '🎤', label: '+ Novo MC', path: '/admin/mcs' },
-    { icon: '📋', label: '+ Nova Edição', path: '/admin/edicoes' },
+    { icon: '📋', label: '+ Nova Edição / Evento', path: '/admin/edicoes' },
     { icon: '⚡', label: 'Gerenciar Bracket', path: '/admin/bracket' },
     { icon: '🖼', label: 'Upload de Fotos', path: '/admin/galeria' },
   ]

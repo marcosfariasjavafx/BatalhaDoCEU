@@ -6,7 +6,7 @@ import { useAuth } from '../../hooks/useAuth'
 const menu = [
   { path: '/admin', icon: '◈', label: 'Dashboard', exact: true },
   { path: '/admin/mcs', icon: '🎤', label: 'MCs' },
-  { path: '/admin/edicoes', icon: '📋', label: 'Edições' },
+  { path: '/admin/edicoes', icon: '📋', label: 'Edições / Eventos' },
   { path: '/admin/bracket', icon: '⚡', label: 'Bracket' },
   { path: '/admin/pontuacao', icon: '🏅', label: 'Pontuação' },
   { path: '/admin/galeria', icon: '🖼', label: 'Galeria' },

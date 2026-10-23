@@ -69,6 +69,25 @@ export interface Edicao {
   created_at?: string
 }
 
+/** Categoria de um evento que não é batalha */
+export type EventoCategoria = 'show' | 'breakdance' | 'grafite' | 'dj' | 'workshop' | 'festival' | 'outro'
+
+/** Evento da Batalha do Céu que não é uma edição de batalha (show, breakdance, grafite...) */
+export interface Evento {
+  id: string
+  titulo: string
+  categoria: EventoCategoria
+  data: string | null
+  horario: string | null
+  local: string | null
+  descricao: string | null
+  banner_url: string | null
+  /** Link opcional (ingressos, inscrição, Instagram do evento...) */
+  link_url: string | null
+  status: EdicaoStatus
+  created_at?: string
+}
+
 export interface Foto {
   id: string
   edicao_id: string | null

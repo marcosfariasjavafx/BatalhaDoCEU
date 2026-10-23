@@ -58,6 +58,24 @@ do $$ begin
   end if;
 end $$;
 
+-- Eventos que não são batalha: shows, breakdance, grafite etc.
+create table if not exists public.eventos (
+  id         uuid primary key default uuid_generate_v4(),
+  titulo     text not null,
+  categoria  text not null default 'show'
+               check (categoria in ('show','breakdance','grafite','dj','workshop','festival','outro')),
+  data       date,
+  horario    text,
+  local      text,
+  descricao  text,
+  banner_url text,
+  link_url   text,
+  status     text not null default 'em-breve'
+               check (status in ('em-breve','confirmada','encerrada')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.fotos (
   id         uuid primary key default uuid_generate_v4(),
   edicao_id  uuid references public.edicoes(id) on delete set null,
@@ -93,6 +111,10 @@ create trigger edicoes_updated_at
   before update on public.edicoes
   for each row execute function public.handle_updated_at();
 
+create trigger eventos_updated_at
+  before update on public.eventos
+  for each row execute function public.handle_updated_at();
+
 -- ============================================================
 -- RLS — Row Level Security
 -- ============================================================
@@ -101,6 +123,7 @@ alter table public.mcs     enable row level security;
 alter table public.edicoes enable row level security;
 alter table public.fotos   enable row level security;
 alter table public.configuracoes enable row level security;
+alter table public.eventos enable row level security;
 
 -- Leitura pública
 create policy "mcs_read"    on public.mcs     for select using (true);
@@ -111,6 +134,9 @@ create policy "fotos_read"  on public.fotos   for select using (true);
 create policy "mcs_write"    on public.mcs     for all using (auth.role() = 'authenticated');
 create policy "edicoes_write" on public.edicoes for all using (auth.role() = 'authenticated');
 create policy "fotos_write"  on public.fotos   for all using (auth.role() = 'authenticated');
+
+create policy "eventos_read"  on public.eventos for select using (true);
+create policy "eventos_write" on public.eventos for all using (auth.role() = 'authenticated');
 
 create policy "configuracoes_read"   on public.configuracoes for select using (true);
 create policy "configuracoes_insert" on public.configuracoes for insert to authenticated with check (true);

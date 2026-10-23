@@ -6,7 +6,8 @@ import { MCAvatar } from '../components/ui/MCAvatar'
 import { Footer } from '../components/ui/Footer'
 import { RankingTicker } from '../components/ui/RankingTicker'
 import { ehEquipe, equipeCampea, formatoLabel } from '../lib/equipes'
-import type { MC, Edicao } from '../types'
+import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
+import type { MC, Edicao, Evento } from '../types'
 
 const FEED_IMAGES = [
   '/assets/feed/feed_00.jpg',
@@ -30,8 +31,20 @@ export default function Home() {
   const [ranking, setRanking] = useState<MC[]>([])
   const [edCount, setEdCount] = useState(0)
   const [slideIdx, setSlideIdx] = useState(0)
+  const [eventos, setEventos] = useState<Evento[]>([])
 
   useEffect(() => {
+    // Próximos eventos (shows, breakdance...) — só os que ainda não passaram
+    supabase.from('eventos').select('*').in('status', ['confirmada', 'em-breve']).order('data').limit(12)
+      .then(({ data }) => {
+        const hoje = new Date(); hoje.setHours(0, 0, 0, 0)
+        const futuros = ((data ?? []) as Evento[]).filter(ev => {
+          if (!ev.data) return true
+          const [y, m, d] = ev.data.split('-').map(Number)
+          return new Date(y, m - 1, d) >= hoje
+        })
+        setEventos(futuros.slice(0, 3))
+      })
     supabase.from('mcs').select('*').order('pontos', { ascending: false }).limit(6).then(({ data }) => setMCs(data ?? []))
     supabase.from('mcs').select('*').order('pontos', { ascending: false }).then(({ data }) => setAllMcs(data ?? []))
     supabase.from('mcs').select('*').order('pontos', { ascending: false }).limit(5).then(({ data }) => setRanking(data ?? []))
@@ -118,6 +131,44 @@ export default function Home() {
           ) : <div className="aviso">Nenhuma edição programada no momento.</div>}
         </div>
       </section>
+
+      {/* PRÓXIMOS EVENTOS (shows, breakdance...) — só aparece se houver evento agendado */}
+      {eventos.length > 0 && (
+        <section className="section" style={{ borderTop: '1px solid var(--B)' }}>
+          <div className="container">
+            <div className="sec-label">Além das Batalhas</div>
+            <div className="sec-title">Próximos Eventos</div>
+            <div className="grid-1px" style={{ gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))' }}>
+              {eventos.map(ev => {
+                const link = linkSeguro(ev.link_url)
+                return (
+                  <div key={ev.id} className="ed-card" style={{ cursor: 'default' }}>
+                    <div className="ed-card-banner">
+                      {ev.banner_url ? <img src={ev.banner_url} alt="" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
+                      <span className={`status-pill ${statusClass(ev.status)}`}>{statusLabel(ev.status)}</span>
+                    </div>
+                    <div className="ed-card-body">
+                      <div className="ed-card-num">{categoriaIcon(ev.categoria)} {categoriaLabel(ev.categoria)}</div>
+                      <div className="ed-card-title">{ev.titulo}</div>
+                      <div className="ed-card-meta">
+                        {ev.data && <span className="ed-meta-item">{fmtData(ev.data)}{ev.horario ? ` · ${ev.horario}` : ''}</span>}
+                        {ev.local && <span className="ed-meta-item">{ev.data ? '· ' : ''}{ev.local}</span>}
+                      </div>
+                      {ev.descricao && <p style={{ fontSize: '.85rem', color: 'var(--MU)', lineHeight: 1.6, marginTop: '.6rem' }}>{ev.descricao}</p>}
+                      {link && (
+                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn-o btn-sm" style={{ marginTop: '.8rem' }}>Saiba mais ↗</a>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ marginTop: '1.5rem' }}>
+              <button className="btn btn-o" onClick={() => { nav('/calendario'); window.scrollTo(0, 0) }}>Ver Calendário Completo</button>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* TOP MCS */}
       <section className="section">
