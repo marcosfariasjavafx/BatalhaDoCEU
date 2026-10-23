@@ -35,9 +35,28 @@ create table if not exists public.edicoes (
   campeao_id    uuid references public.mcs(id) on delete set null,
   participantes uuid[] not null default '{}',
   bracket       jsonb,
+  -- Formato: individual (solo), dupla ou trio. Em dupla/trio, `equipes` guarda
+  -- [{id, nome, membros:[mc_id,...]}] e o bracket usa o id da equipe em mc1/mc2/winner.
+  formato       text not null default 'solo'
+                  check (formato in ('solo','dupla','trio')),
+  equipes       jsonb not null default '[]'::jsonb,
+  -- MCs campeões (integrantes da equipe campeã). No formato solo vale campeao_id.
+  campeoes      uuid[] not null default '{}',
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
+
+-- Bancos criados antes do formato dupla/trio: adiciona as colunas novas (idempotente)
+alter table public.edicoes
+  add column if not exists formato  text  not null default 'solo',
+  add column if not exists equipes  jsonb not null default '[]'::jsonb,
+  add column if not exists campeoes uuid[] not null default '{}';
+
+do $$ begin
+  if not exists (select 1 from pg_constraint where conname = 'edicoes_formato_check') then
+    alter table public.edicoes add constraint edicoes_formato_check check (formato in ('solo','dupla','trio'));
+  end if;
+end $$;
 
 create table if not exists public.fotos (
   id         uuid primary key default uuid_generate_v4(),

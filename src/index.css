@@ -185,7 +185,12 @@ a { text-decoration: none; color: inherit; }
 .bracket-mc.lost { color: var(--MU2); }
 .bracket-mc.pending { color: var(--MU); }
 .bracket-mc-name { display: flex; align-items: center; gap: .3rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bracket-mc-name.team { white-space: normal; text-overflow: clip; line-height: 1.2; overflow-wrap: anywhere; }
 .bracket-trophy { font-size: .8rem; flex-shrink: 0; }
+.team-card { background: var(--P3); border: 1px solid var(--B); padding: .75rem 1rem; }
+.team-card.champ { border-color: rgba(171,49,48,.5); background: rgba(171,49,48,.08); }
+.team-card-name { font-family: var(--FC); font-size: .9rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .45rem; overflow-wrap: anywhere; }
+.team-card.champ .team-card-name { color: var(--Y); }
 .bracket-rounds { flex-shrink: 0; font-family: var(--FD); font-size: 1.05rem; line-height: 1; color: var(--MU2); min-width: 16px; text-align: center; }
 .bracket-rounds[data-won="true"] { color: var(--Y); }
 

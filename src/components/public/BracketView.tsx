@@ -1,11 +1,24 @@
-import type { BracketData, MC } from '../../types'
+import type { BracketData, Equipe, MC } from '../../types'
 import { getPhasesForN } from '../../lib/utils'
+import { nomeCompetidor } from '../../lib/equipes'
 
-interface Props { bracket: BracketData; mcs: MC[]; participantCount: number }
+interface Props {
+  bracket: BracketData
+  mcs: MC[]
+  /** Equipes da edição (dupla/trio). Sem isso, os competidores são MCs individuais. */
+  equipes?: Equipe[]
+  participantCount?: number
+}
 
-export function BracketView({ bracket, mcs, participantCount }: Props) {
-  const phases = getPhasesForN(participantCount || 8)
-  const getMC = (id: string | null) => mcs.find(m => m.id === id)
+export function BracketView({ bracket, mcs, equipes, participantCount }: Props) {
+  // Nº de competidores = 2 por confronto da 1ª fase (vale para MCs e para equipes)
+  const competitors = (bracket.matches[bracket.phases[0]]?.length ?? 0) * 2
+  const phases = getPhasesForN(competitors || participantCount || 8)
+  const isTeam = !!equipes?.length
+  const getMC = (id: string | null) => {
+    const nome = nomeCompetidor(id, equipes, mcs)
+    return nome ? { nome } : undefined
+  }
 
   return (
     <div className="bracket-wrap">
@@ -28,14 +41,14 @@ export function BracketView({ bracket, mcs, participantCount }: Props) {
                 return (
                   <div key={i} className="bracket-match">
                     <div className={`bracket-mc ${c1}`}>
-                      <span className="bracket-mc-name">
+                      <span className={`bracket-mc-name${isTeam ? ' team' : ''}`} title={mc1?.nome}>
                         {c1 === "won" && <span className="bracket-trophy">🏆</span>}
                         {mc1?.nome ?? "A definir"}
                       </span>
                       {hasRounds && <span className="bracket-rounds" data-won={c1 === "won"}>{r1}</span>}
                     </div>
                     <div className={`bracket-mc ${c2}`}>
-                      <span className="bracket-mc-name">
+                      <span className={`bracket-mc-name${isTeam ? ' team' : ''}`} title={mc2?.nome}>
                         {c2 === "won" && <span className="bracket-trophy">🏆</span>}
                         {mc2?.nome ?? "A definir"}
                       </span>

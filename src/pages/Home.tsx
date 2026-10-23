@@ -5,6 +5,7 @@ import { fmtData, statusClass, statusLabel } from '../lib/utils'
 import { MCAvatar } from '../components/ui/MCAvatar'
 import { Footer } from '../components/ui/Footer'
 import { RankingTicker } from '../components/ui/RankingTicker'
+import { ehEquipe, equipeCampea, formatoLabel } from '../lib/equipes'
 import type { MC, Edicao } from '../types'
 
 const FEED_IMAGES = [
@@ -178,7 +179,9 @@ export default function Home() {
                   <div className="ed-card-meta">
                     <span className="ed-meta-item">{fmtData(ed.data)}</span>
                     {ed.local && <span className="ed-meta-item">· {ed.local}</span>}
+                    {ehEquipe(ed.formato) && <span className="ed-meta-item">· {formatoLabel(ed.formato)}</span>}
                     {ed.campeao && <span className="ed-meta-item">· 🏆 {(ed.campeao as any).nome}</span>}
+                    {!ed.campeao && equipeCampea(ed) && <span className="ed-meta-item">· 🏆 {equipeCampea(ed)!.nome}</span>}
                   </div>
                 </div>
               </div>

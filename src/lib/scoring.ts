@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import type { BracketData, BracketMatch, BracketMeta } from '../types'
+import type { BracketData, BracketMatch, BracketMeta, Formato } from '../types'
 
 export interface PointDelta {
   mcId: string
@@ -7,25 +7,48 @@ export interface PointDelta {
   reason: string
 }
 
+/**
+ * Contexto de pontuação. No bracket, os competidores são MCs (formato individual) ou equipes
+ * (dupla/trio). `membersOf` diz quais MCs recebem os pontos de um competidor — numa equipe,
+ * cada integrante recebe os pontos completos.
+ */
+export interface ScoringCtx {
+  membersOf: (competitorId: string) => string[]
+}
+
+const SOLO_CTX: ScoringCtx = { membersOf: id => [id] }
+
+function pushDelta(deltas: PointDelta[], ctx: ScoringCtx, competitorId: string, delta: number, reason: string) {
+  for (const mcId of ctx.membersOf(competitorId)) deltas.push({ mcId, delta, reason })
+}
+
 // ─── Fetch meta (called when building a new bracket) ─────────────────────────
 
-export async function fetchBracketMeta(currentEditionId: string): Promise<BracketMeta> {
-  // Find the most recent completed edition (excluding current)
-  const { data: allEnded } = await supabase
-    .from('edicoes')
-    .select('id, campeao_id')
-    .eq('status', 'encerrada')
-    .neq('id', currentEditionId)
-    .order('data', { ascending: false })
-
-  const prevChampionId = allEnded?.[0]?.campeao_id ?? null
-
-  // Compute consecutive win streak for prev champion
+export async function fetchBracketMeta(currentEditionId: string, formato: Formato = 'solo'): Promise<BracketMeta> {
+  // As regras de "campeão anterior" (eliminar o último campeão, streak, bicampeão) dizem respeito
+  // a um MC defendendo o título. Em dupla/trio as equipes mudam a cada edição, então essas regras
+  // ficam desligadas (prevChampionId = null) e só valem no formato individual.
+  let prevChampionId: string | null = null
   let prevChampWinStreak = 0
-  if (prevChampionId && allEnded) {
-    for (const ed of allEnded) {
-      if (ed.campeao_id === prevChampionId) prevChampWinStreak++
-      else break
+
+  if (formato === 'solo') {
+    // Find the most recent completed edition (excluding current)
+    const { data: allEnded } = await supabase
+      .from('edicoes')
+      .select('id, campeao_id')
+      .eq('status', 'encerrada')
+      .eq('formato', 'solo')
+      .neq('id', currentEditionId)
+      .order('data', { ascending: false })
+
+    prevChampionId = allEnded?.[0]?.campeao_id ?? null
+
+    // Compute consecutive win streak for prev champion
+    if (prevChampionId && allEnded) {
+      for (const ed of allEnded) {
+        if (ed.campeao_id === prevChampionId) prevChampWinStreak++
+        else break
+      }
     }
   }
 
@@ -69,7 +92,8 @@ function count20Wins(bracket: BracketData, mcId: string): number {
 export function calcMatchDeltas(
   bracket: BracketData,
   phKey: string,
-  match: BracketMatch
+  match: BracketMatch,
+  ctx: ScoringCtx = SOLO_CTX
 ): { deltas: PointDelta[]; metaUpdates: Partial<BracketMeta> } {
   const meta = bracket.meta
   if (!meta || !match.winner || match.pointsApplied) return { deltas: [], metaUpdates: {} }
@@ -88,28 +112,30 @@ export function calcMatchDeltas(
 
   // +3 Vencer por 2×0
   if (isSweep) {
-    deltas.push({ mcId: winner, delta: 3, reason: 'Vitória 2×0' })
+    pushDelta(deltas, ctx, winner, 3, 'Vitória 2×0')
   }
 
   // +5 Vencer top 3 do ranking (não escalona por edição)
-  if (meta.top3Ids?.includes(loser) && !meta.top3BonusGiven?.includes(winner)) {
-    deltas.push({ mcId: winner, delta: 5, reason: 'Venceu top 3 do ranking' })
+  // Em dupla/trio vale se algum integrante da equipe derrotada está no top 3.
+  const loserIsTop3 = ctx.membersOf(loser).some(mcId => meta.top3Ids?.includes(mcId))
+  if (loserIsTop3 && !meta.top3BonusGiven?.includes(winner)) {
+    pushDelta(deltas, ctx, winner, 5, 'Venceu top 3 do ranking')
     metaUpdates.top3BonusGiven = [...(meta.top3BonusGiven ?? []), winner]
   }
 
-  // Regras envolvendo o campeão anterior
+  // Regras envolvendo o campeão anterior (só no formato individual — ver fetchBracketMeta)
   if (meta.prevChampionId && meta.prevChampionId === loser) {
     // +1 Eliminou o último campeão
-    deltas.push({ mcId: winner, delta: 1, reason: 'Eliminou o último campeão' })
+    pushDelta(deltas, ctx, winner, 1, 'Eliminou o último campeão')
 
     // +4 Eliminou campeão com streak de 2+ edições
     if ((meta.prevChampWinStreak ?? 0) >= 2) {
-      deltas.push({ mcId: winner, delta: 4, reason: `Eliminou campeão em série (${meta.prevChampWinStreak}× consecutivo)` })
+      pushDelta(deltas, ctx, winner, 4, `Eliminou campeão em série (${meta.prevChampWinStreak}× consecutivo)`)
     }
 
     // -1 Último campeão caiu na 1ª fase
     if (phKey === bracket.phases[0]) {
-      deltas.push({ mcId: loser, delta: -1, reason: 'Campeão eliminado na 1ª fase' })
+      pushDelta(deltas, ctx, loser, -1, 'Campeão eliminado na 1ª fase')
     }
   }
 
@@ -120,7 +146,8 @@ export function calcMatchDeltas(
 
 export function calcSweepBonusDeltas(
   bracket: BracketData,
-  winnerId: string
+  winnerId: string,
+  ctx: ScoringCtx = SOLO_CTX
 ): { deltas: PointDelta[]; metaUpdates: Partial<BracketMeta> } {
   const meta = bracket.meta
   if (!meta) return { deltas: [], metaUpdates: {} }
@@ -128,8 +155,10 @@ export function calcSweepBonusDeltas(
 
   const count = count20Wins(bracket, winnerId)
   if (count >= 3) {
+    const deltas: PointDelta[] = []
+    pushDelta(deltas, ctx, winnerId, 2, `Ganhou ${count}× de 2-0 na edição`)
     return {
-      deltas: [{ mcId: winnerId, delta: 2, reason: `Ganhou ${count}× de 2-0 na edição` }],
+      deltas,
       metaUpdates: { sweepBonusGiven: [...(meta.sweepBonusGiven ?? []), winnerId] },
     }
   }
@@ -140,7 +169,8 @@ export function calcSweepBonusDeltas(
 
 export function calcPhaseCompletionDeltas(
   bracket: BracketData,
-  phKey: string
+  phKey: string,
+  ctx: ScoringCtx = SOLO_CTX
 ): { deltas: PointDelta[]; metaUpdates: Partial<BracketMeta> } {
   const meta = bracket.meta
   if (!meta) return { deltas: [], metaUpdates: {} }
@@ -159,7 +189,7 @@ export function calcPhaseCompletionDeltas(
     for (const m of matches) {
       if (m.winner) {
         const loser = m.winner === m.mc1 ? m.mc2 : m.mc1
-        if (loser) deltas.push({ mcId: loser, delta: 4, reason: 'Semifinalista' })
+        if (loser) pushDelta(deltas, ctx, loser, 4, 'Semifinalista')
       }
     }
     metaUpdates.semiPointsApplied = true
@@ -172,12 +202,12 @@ export function calcPhaseCompletionDeltas(
       const champion = final.winner
       const vice = champion === final.mc1 ? final.mc2 : final.mc1
 
-      deltas.push({ mcId: champion, delta: 10, reason: 'Campeão 🏆' })
-      if (vice) deltas.push({ mcId: vice, delta: 5, reason: 'Vice-campeão' })
+      pushDelta(deltas, ctx, champion, 10, 'Campeão 🏆')
+      if (vice) pushDelta(deltas, ctx, vice, 5, 'Vice-campeão')
 
-      // +1 Campeão 2 vezes consecutivas
+      // +1 Campeão 2 vezes consecutivas (só no formato individual)
       if (meta.prevChampionId && meta.prevChampionId === champion) {
-        deltas.push({ mcId: champion, delta: 1, reason: 'Bicampeão (consecutivo)' })
+        pushDelta(deltas, ctx, champion, 1, 'Bicampeão (consecutivo)')
       }
     }
     metaUpdates.finalPointsApplied = true

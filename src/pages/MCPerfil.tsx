@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { MCAvatar } from '../components/ui/MCAvatar'
 import { Footer } from '../components/ui/Footer'
+import { ehCampeao } from '../lib/equipes'
 import type { MC, Edicao } from '../types'
 
 export default function MCPerfil() {
@@ -10,7 +11,7 @@ export default function MCPerfil() {
   const nav = useNavigate()
   const [mc, setMC] = useState<MC | null>(null)
   const [pos, setPos] = useState(0)
-  const [edicoesPart, setEdicoesPart] = useState<Pick<Edicao, 'id' | 'titulo' | 'status' | 'campeao_id' | 'participantes'>[]>([])
+  const [edicoesPart, setEdicoesPart] = useState<Pick<Edicao, 'id' | 'titulo' | 'status' | 'campeao_id' | 'campeoes' | 'participantes'>[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -18,7 +19,7 @@ export default function MCPerfil() {
     Promise.all([
       supabase.from('mcs').select('*').eq('id', id).single(),
       supabase.from('mcs').select('id,pontos').order('pontos', { ascending: false }),
-      supabase.from('edicoes').select('id,titulo,status,campeao_id,participantes').order('data', { ascending: false }),
+      supabase.from('edicoes').select('id,titulo,status,campeao_id,campeoes,participantes').order('data', { ascending: false }),
     ]).then(([{ data: mcData }, { data: allMCs }, { data: eds }]) => {
       setMC(mcData)
       setPos((allMCs ?? []).findIndex(m => m.id === id) + 1)
@@ -70,10 +71,10 @@ export default function MCPerfil() {
             {edicoesPart.length ? edicoesPart.map(e => (
               <span
                 key={e.id}
-                className={`tag ${e.campeao_id === id ? 'tag-champ' : 'tag-part'}`}
+                className={`tag ${ehCampeao(e, id!) ? 'tag-champ' : 'tag-part'}`}
                 onClick={() => { nav(`/edicoes/${e.id}`); window.scrollTo(0, 0) }}
               >
-                {e.titulo}{e.campeao_id === id ? ' 🏆' : ''}
+                {e.titulo}{ehCampeao(e, id!) ? ' 🏆' : ''}
               </span>
             )) : (
               <span style={{ fontFamily: 'var(--FC)', fontSize: '.85rem', color: 'var(--MU)' }}>Nenhuma edição ainda.</span>

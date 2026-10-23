@@ -1,5 +1,15 @@
 export type EdicaoStatus = 'em-breve' | 'confirmada' | 'encerrada'
 
+/** Formato da batalha: individual (1×1), dupla (2×2) ou trio (3×3) */
+export type Formato = 'solo' | 'dupla' | 'trio'
+
+/** Equipe de uma edição em formato dupla/trio. No bracket, mc1/mc2/winner guardam o `id` da equipe. */
+export interface Equipe {
+  id: string
+  nome: string
+  membros: string[] // ids de MCs
+}
+
 export interface MC {
   id: string
   nome: string
@@ -52,6 +62,10 @@ export interface Edicao {
   campeao_id: string | null
   participantes: string[]
   bracket: BracketData | null
+  formato: Formato
+  equipes: Equipe[]
+  /** MCs campeões (integrantes da equipe campeã). No formato solo vale `campeao_id`. */
+  campeoes: string[]
   created_at?: string
 }
 

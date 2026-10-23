@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { fmtData, statusClass, statusLabel } from '../lib/utils'
 import { Footer } from '../components/ui/Footer'
+import { ehEquipe, equipeCampea, formatoLabel } from '../lib/equipes'
 import type { Edicao, MC } from '../types'
 
 type EdicaoWithCamp = Edicao & { campeao?: MC | null }
@@ -39,7 +40,9 @@ export default function Edicoes() {
                       <div className="ed-card-meta">
                         <span className="ed-meta-item">{fmtData(ed.data)}</span>
                         {ed.local && <span className="ed-meta-item">· {ed.local}</span>}
+                        {ehEquipe(ed.formato) && <span className="ed-meta-item">· {formatoLabel(ed.formato)}</span>}
                         {ed.campeao && <span className="ed-meta-item">· 🏆 {(ed.campeao as any).nome}</span>}
+                        {!ed.campeao && equipeCampea(ed) && <span className="ed-meta-item">· 🏆 {equipeCampea(ed)!.nome}</span>}
                       </div>
                     </div>
                   </div>

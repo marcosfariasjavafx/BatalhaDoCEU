@@ -2,11 +2,13 @@ import { useEffect, useState, useRef, FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
 import { uploadFile, compressImage, fmtData, statusClass, statusLabel } from '../../lib/utils'
 import { useToast } from '../../hooks/useToast'
-import type { Edicao, EdicaoStatus, MC } from '../../types'
+import { FORMATOS, formatoLabel, ehEquipe, equipeCampea } from '../../lib/equipes'
+import type { Edicao, EdicaoStatus, Formato, MC } from '../../types'
 
 const EMPTY = {
   titulo: '', data: '', horario: '', local: '', descricao: '',
   status: 'em-breve' as EdicaoStatus, limite: 8,
+  formato: 'solo' as Formato,
   banner_url: null as string | null, campeao_id: null as string | null,
   participantes: [] as string[], bracket: null as any,
 }
@@ -20,6 +22,7 @@ export default function AdminEdicoes() {
   const [modal, setModal] = useState(false)
   const [form, setForm] = useState({ ...EMPTY })
   const [editId, setEditId] = useState<string | null>(null)
+  const [origFormato, setOrigFormato] = useState<Formato>('solo')
   const [saving, setSaving] = useState(false)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [bannerFile, setBannerFile] = useState<File | null>(null)
@@ -36,14 +39,16 @@ export default function AdminEdicoes() {
   useEffect(() => { load() }, [])
 
   function openNew() {
-    setEditId(null); setForm({ ...EMPTY }); setBannerPreview(null); setBannerFile(null); setModal(true)
+    setEditId(null); setOrigFormato('solo'); setForm({ ...EMPTY }); setBannerPreview(null); setBannerFile(null); setModal(true)
   }
 
   function openEdit(ed: EdicaoWithCamp) {
     setEditId(ed.id)
+    setOrigFormato(ed.formato ?? 'solo')
     setForm({
       titulo: ed.titulo, data: ed.data ?? '', horario: ed.horario ?? '',
       local: ed.local ?? '', descricao: ed.descricao ?? '', status: ed.status,
+      formato: ed.formato ?? 'solo',
       limite: ed.limite, banner_url: ed.banner_url,
       campeao_id: ed.campeao_id, participantes: ed.participantes ?? [], bracket: ed.bracket,
     })
@@ -69,7 +74,9 @@ export default function AdminEdicoes() {
         const compressed = await compressImage(bannerFile, 1080, 0.85)
         banner_url = await uploadFile(compressed, 'banners')
       }
-      const payload = { ...form, banner_url, limite: Number(form.limite) }
+      const payload: Record<string, unknown> = { ...form, banner_url, limite: Number(form.limite) }
+      // Trocou o formato (só é permitido sem bracket): as equipes antigas não valem mais
+      if (editId && form.formato !== origFormato) payload.equipes = []
       if (editId) {
         const { error } = await supabase.from('edicoes').update(payload).eq('id', editId)
         if (error) throw error
@@ -114,7 +121,9 @@ export default function AdminEdicoes() {
                   </div>
                   <div style={{ fontFamily: 'var(--FC)', fontSize: '.78rem', color: 'var(--MU)' }}>
                     {fmtData(ed.data)}{ed.local ? ` · ${ed.local}` : ''} · {ed.limite} MCs
+                    {ehEquipe(ed.formato) && ` · ${formatoLabel(ed.formato)}`}
                     {ed.campeao && ` · 🏆 ${(ed.campeao as any).nome}`}
+                    {!ed.campeao && equipeCampea(ed) && ` · 🏆 ${equipeCampea(ed)!.nome}`}
                   </div>
                 </div>
                 <div className="admin-row-actions">
@@ -183,6 +192,24 @@ export default function AdminEdicoes() {
                   <div className="form-group">
                     <label className="form-label">Limite de MCs</label>
                     <input className="form-input" type="number" min="4" value={form.limite} onChange={e => setForm({ ...form, limite: +e.target.value })} />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Formato da batalha</label>
+                  <select
+                    className="form-select"
+                    value={form.formato}
+                    disabled={!!editId && !!form.bracket}
+                    onChange={e => setForm({ ...form, formato: e.target.value as Formato })}
+                  >
+                    {FORMATOS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                  </select>
+                  <div style={{ fontFamily: 'var(--FC)', fontSize: '.68rem', color: 'var(--MU)', marginTop: '.35rem', lineHeight: 1.5 }}>
+                    {editId && form.bracket
+                      ? 'O formato não pode mudar depois que o chaveamento foi criado. Reset o bracket (aba Bracket) para trocar.'
+                      : ehEquipe(form.formato)
+                        ? 'As equipes são montadas na aba Bracket, a partir dos MCs participantes.'
+                        : 'Cada MC batalha sozinho.'}
                   </div>
                 </div>
                 <div className="form-group">
