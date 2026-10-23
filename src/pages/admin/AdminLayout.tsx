@@ -8,6 +8,7 @@ const menu = [
   { path: '/admin/mcs', icon: '🎤', label: 'MCs' },
   { path: '/admin/edicoes', icon: '📋', label: 'Edições' },
   { path: '/admin/bracket', icon: '⚡', label: 'Bracket' },
+  { path: '/admin/pontuacao', icon: '🏅', label: 'Pontuação' },
   { path: '/admin/galeria', icon: '🖼', label: 'Galeria' },
 ]
 

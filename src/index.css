@@ -712,6 +712,24 @@ footer { background: var(--P2); border-top: 1px solid var(--B); padding: 2.5rem 
   user-select: none;
 }
 
+/* CONFIGURAÇÕES (admin) */
+.setting-card { display: flex; gap: 1.5rem; align-items: flex-start; justify-content: space-between; background: var(--P3); border: 1px solid var(--B); padding: 1.5rem; max-width: 760px; }
+.setting-info { flex: 1; min-width: 0; }
+.setting-title { font-family: var(--FC); font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin-bottom: .6rem; }
+.setting-desc { font-size: .9rem; color: var(--W2); line-height: 1.65; margin-bottom: .6rem; }
+.setting-note { color: var(--MU); font-size: .82rem; }
+.setting-control { display: flex; flex-direction: column; align-items: center; gap: .5rem; flex-shrink: 0; }
+.setting-status { font-family: var(--FC); font-size: .72rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+.setting-status.on { color: #6fcf7f; }
+.setting-status.off { color: var(--R); }
+.switch { position: relative; width: 56px; height: 30px; border-radius: 15px; border: 1px solid var(--B2); background: var(--P5); cursor: pointer; transition: background .2s, border-color .2s; padding: 0; }
+.switch:disabled { opacity: .6; cursor: wait; }
+.switch.on { background: var(--Y); border-color: var(--Y); }
+.switch-knob { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--W); transition: transform .2s; }
+.switch.on .switch-knob { transform: translateX(26px); }
+.switch:focus-visible { outline: 2px solid var(--W); outline-offset: 2px; }
+.auto-off-banner { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; background: rgba(224,80,80,.1); border: 1px solid rgba(224,80,80,.4); color: var(--R); font-family: var(--FC); font-size: .85rem; padding: .7rem 1rem; margin-bottom: 1.5rem; }
+
 /* LAYOUT HELPERS (substituem grids inline, para poderem ter media queries) */
 .page-wrap { padding: 3.5rem 2rem; max-width: 900px; margin: 0 auto; }
 .split-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
@@ -782,6 +800,8 @@ footer { background: var(--P2); border-top: 1px solid var(--B); padding: 2.5rem 
   .admin-row-mc { grid-template-columns: 44px 1fr; padding: .8rem 1rem; }
   .admin-row-ed { grid-template-columns: 1fr; padding: .85rem 1rem; }
   .admin-row-mc .admin-row-actions { grid-column: 1 / -1; }
+  .setting-card { flex-direction: column; padding: 1.1rem; }
+  .setting-control { flex-direction: row; gap: .75rem; }
   .admin-content { padding: 1rem; }
   .admin-panel-title { font-size: 1.3rem; }
   .login-wrap { padding: 1rem; }

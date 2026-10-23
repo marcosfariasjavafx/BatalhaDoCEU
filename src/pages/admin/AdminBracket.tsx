@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { getAutoScoring } from '../../lib/settings'
 import { getPhasesForN } from '../../lib/utils'
 import { useToast } from '../../hooks/useToast'
 import {
@@ -259,8 +261,11 @@ export default function AdminBracket() {
   const [activeMatch, setActiveMatch] = useState<{ phKey: string; idx: number } | null>(null)
   const [showSeedModal, setShowSeedModal] = useState(false)
   const [scoreLog, setScoreLog] = useState<DeltaSummary[]>([])
+  const [autoScoring, setAutoScoringState] = useState(true)
 
-  const getMC = useCallback((id: string | null) => mcs.find(m => m.id === id), [mcs])
+  useEffect(() => { getAutoScoring().then(setAutoScoringState) }, [])
+
+  const getMC =useCallback((id: string | null) => mcs.find(m => m.id === id), [mcs])
 
   useEffect(() => {
     Promise.all([
@@ -339,19 +344,28 @@ export default function AdminBracket() {
     const allDeltas: import('../../lib/scoring').PointDelta[] = []
     let metaUpdates: Partial<BracketMeta> = {}
 
+    // Lê o interruptor direto do banco (não do estado) para refletir mudanças feitas em outra aba/dispositivo
+    const autoOn = await getAutoScoring()
+    setAutoScoringState(autoOn)
+
     // 1. Per-match points (only when winner is set for the first time)
     if (!prevMatch.pointsApplied && updatedMatch.winner) {
-      const { deltas: md, metaUpdates: mmu } = calcMatchDeltas(bracket, phKey, updatedMatch)
-      allDeltas.push(...md)
-      Object.assign(metaUpdates, mmu)
-      if (bracket.meta) Object.assign(bracket.meta, mmu)
-      bracket.matches[phKey][matchIdx].pointsApplied = true
+      if (autoOn) {
+        const { deltas: md, metaUpdates: mmu } = calcMatchDeltas(bracket, phKey, updatedMatch)
+        allDeltas.push(...md)
+        Object.assign(metaUpdates, mmu)
+        if (bracket.meta) Object.assign(bracket.meta, mmu)
 
-      // 2. Sweep bonus (3x 2-0)
-      const { deltas: sd, metaUpdates: smu } = calcSweepBonusDeltas(bracket, updatedMatch.winner)
-      allDeltas.push(...sd)
-      Object.assign(metaUpdates, smu)
-      if (bracket.meta) Object.assign(bracket.meta, smu)
+        // 2. Sweep bonus (3x 2-0)
+        const { deltas: sd, metaUpdates: smu } = calcSweepBonusDeltas(bracket, updatedMatch.winner)
+        allDeltas.push(...sd)
+        Object.assign(metaUpdates, smu)
+        if (bracket.meta) Object.assign(bracket.meta, smu)
+      } else {
+        toast('Pontuação automática desativada — nenhum ponto foi aplicado')
+      }
+      // Marca como tratada mesmo com o cálculo desligado: ligar depois não gera pontos retroativos
+      bracket.matches[phKey][matchIdx].pointsApplied = true
     }
 
     const phaseKeys = bracket.phases
@@ -365,9 +379,15 @@ export default function AdminBracket() {
     if (phaseComplete) {
       // 3. Phase completion points (semi, final)
       const { deltas: phD, metaUpdates: phMu } = calcPhaseCompletionDeltas(bracket, phKey)
-      allDeltas.push(...phD)
-      Object.assign(metaUpdates, phMu)
-      if (bracket.meta) Object.assign(bracket.meta, phMu)
+      if (autoOn) {
+        allDeltas.push(...phD)
+        Object.assign(metaUpdates, phMu)
+        if (bracket.meta) Object.assign(bracket.meta, phMu)
+      } else if (bracket.meta) {
+        // Desligado: não pontua, mas marca semi/final como tratadas para não pontuar retroativamente
+        if (phMu.semiPointsApplied) bracket.meta.semiPointsApplied = true
+        if (phMu.finalPointsApplied) bracket.meta.finalPointsApplied = true
+      }
 
       const winners = allPhaseMatches.map(m => m.winner!)
       const isLast = phIdx === phaseKeys.length - 1
@@ -421,6 +441,13 @@ export default function AdminBracket() {
   return (
     <div>
       <div className="admin-panel-title">Bracket / Chaveamento</div>
+
+      {!autoScoring && (
+        <div className="auto-off-banner">
+          <span>⚠ Pontuação automática desativada — os resultados não somam pontos no ranking.</span>
+          <Link to="/admin/pontuacao" className="btn btn-o btn-sm">Ativar</Link>
+        </div>
+      )}
 
       <div className="form-group" style={{ maxWidth: 360, marginBottom: '2rem' }}>
         <label className="form-label">Edição</label>

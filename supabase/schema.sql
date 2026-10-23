@@ -47,14 +47,24 @@ create table if not exists public.fotos (
   created_at timestamptz not null default now()
 );
 
+-- Configurações gerais do site (ex.: liga/desliga da pontuação automática)
+create table if not exists public.configuracoes (
+  chave      text primary key,
+  valor      jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
 -- ============================================================
 -- TRIGGERS updated_at
 -- ============================================================
 
 create or replace function public.handle_updated_at()
-returns trigger as $$
+returns trigger
+language plpgsql
+set search_path = ''
+as $$
 begin new.updated_at = now(); return new; end;
-$$ language plpgsql;
+$$;
 
 create trigger mcs_updated_at
   before update on public.mcs
@@ -71,6 +81,7 @@ create trigger edicoes_updated_at
 alter table public.mcs     enable row level security;
 alter table public.edicoes enable row level security;
 alter table public.fotos   enable row level security;
+alter table public.configuracoes enable row level security;
 
 -- Leitura pública
 create policy "mcs_read"    on public.mcs     for select using (true);
@@ -81,6 +92,23 @@ create policy "fotos_read"  on public.fotos   for select using (true);
 create policy "mcs_write"    on public.mcs     for all using (auth.role() = 'authenticated');
 create policy "edicoes_write" on public.edicoes for all using (auth.role() = 'authenticated');
 create policy "fotos_write"  on public.fotos   for all using (auth.role() = 'authenticated');
+
+create policy "configuracoes_read"   on public.configuracoes for select using (true);
+create policy "configuracoes_insert" on public.configuracoes for insert to authenticated with check (true);
+create policy "configuracoes_update" on public.configuracoes for update to authenticated using (true) with check (true);
+
+-- Pontuação automática ligada por padrão
+insert into public.configuracoes (chave, valor)
+values ('pontuacao_automatica', '{"ativo": true}'::jsonb)
+on conflict (chave) do nothing;
+
+-- Event trigger de RLS automático: não deve ser chamável via API pública
+-- (só se a função rls_auto_enable existir no projeto, como no Supabase hospedado)
+do $$ begin
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+  end if;
+end $$;
 
 -- ============================================================
 -- REALTIME — Habilitar tabela edicoes

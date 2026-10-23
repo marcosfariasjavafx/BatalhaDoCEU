@@ -23,6 +23,7 @@ import AdminMCs from './pages/admin/AdminMCs'
 import AdminEdicoes from './pages/admin/AdminEdicoes'
 import AdminBracket from './pages/admin/AdminBracket'
 import AdminGaleria from './pages/admin/AdminGaleria'
+import AdminPontuacao from './pages/admin/AdminPontuacao'
 
 export default function App() {
   return (
@@ -53,6 +54,7 @@ export default function App() {
             <Route path="mcs" element={<AdminMCs />} />
             <Route path="edicoes" element={<AdminEdicoes />} />
             <Route path="bracket" element={<AdminBracket />} />
+            <Route path="pontuacao" element={<AdminPontuacao />} />
             <Route path="galeria" element={<AdminGaleria />} />
           </Route>
         </Routes>
