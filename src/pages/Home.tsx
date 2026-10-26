@@ -155,7 +155,7 @@ export default function Home() {
               {eventos.map(ev => {
                 const link = linkSeguro(ev.link_url)
                 return (
-                  <div key={ev.id} className="ed-card" style={{ cursor: 'default' }}>
+                  <div key={ev.id} className="ed-card" onClick={() => go(`/eventos/${ev.id}`)}>
                     <div className="ed-card-banner">
                       {ev.banner_url ? <img src={ev.banner_url} alt="" loading="lazy" decoding="async" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
                       <span className={`status-pill ${statusClass(ev.status)}`}>{statusLabel(ev.status)}</span>
@@ -169,7 +169,7 @@ export default function Home() {
                       </div>
                       {ev.descricao && <p style={{ fontSize: '.85rem', color: 'var(--MU)', lineHeight: 1.6, marginTop: '.6rem' }}>{ev.descricao}</p>}
                       {link && (
-                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn-o btn-sm" style={{ marginTop: '.8rem' }}>Saiba mais ↗</a>
+                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn-o btn-sm" style={{ marginTop: '.8rem' }} onClick={e => e.stopPropagation()}>Saiba mais ↗</a>
                       )}
                     </div>
                   </div>
@@ -267,7 +267,7 @@ export default function Home() {
               {eventosPassados.map(ev => {
                 const link = linkSeguro(ev.link_url)
                 return (
-                  <div key={ev.id} className="ed-card" style={{ cursor: 'default' }}>
+                  <div key={ev.id} className="ed-card" onClick={() => go(`/eventos/${ev.id}`)}>
                     <div className="ed-card-banner">
                       {ev.banner_url ? <img src={ev.banner_url} alt="" loading="lazy" decoding="async" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
                       <span className={`status-pill ${statusClass('encerrada')}`}>{statusLabel('encerrada')}</span>
@@ -281,7 +281,7 @@ export default function Home() {
                       </div>
                       {ev.descricao && <p style={{ fontSize: '.85rem', color: 'var(--MU)', lineHeight: 1.6, marginTop: '.6rem' }}>{ev.descricao}</p>}
                       {link && (
-                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn-o btn-sm" style={{ marginTop: '.8rem' }}>Saiba mais ↗</a>
+                        <a href={link} target="_blank" rel="noopener noreferrer" className="btn btn-o btn-sm" style={{ marginTop: '.8rem' }} onClick={e => e.stopPropagation()}>Saiba mais ↗</a>
                       )}
                     </div>
                   </div>

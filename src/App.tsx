@@ -15,6 +15,7 @@ const Galeria = lazy(() => import('./pages/Galeria'))
 const Sobre = lazy(() => import('./pages/Sobre'))
 const Contato = lazy(() => import('./pages/Contato'))
 const Calendario = lazy(() => import('./pages/Calendario'))
+const EventoDetalhe = lazy(() => import('./pages/EventoDetalhe'))
 
 // Admin
 const Login = lazy(() => import('./pages/admin/Login'))
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/galeria" element={<><Navbar /><Galeria /></>} />
           <Route path="/contato" element={<><Navbar /><Contato /></>} />
           <Route path="/calendario" element={<><Navbar /><Calendario /></>} />
+          <Route path="/eventos/:id" element={<><Navbar /><EventoDetalhe /></>} />
 
           {/* Login admin — sem layout */}
           <Route path="/admin/login" element={<><Navbar /><Login /></>} />

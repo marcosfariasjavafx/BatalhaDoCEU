@@ -62,7 +62,7 @@ export default function Calendario() {
 
   const openItem = (it: AgendaItem) => {
     if (it.tipo === 'edicao') { nav(`/edicoes/${it.id}`); window.scrollTo(0, 0) }
-    else if (it.link) window.open(it.link, '_blank', 'noopener,noreferrer')
+    else { nav(`/eventos/${it.id}`); window.scrollTo(0, 0) }
   }
 
   /* -------- Calendar grid helpers -------- */
@@ -257,8 +257,7 @@ function EventCard({ ed, fmtDate, onClick }: {
   fmtDate: (d: string, h: string | null) => string
   onClick: () => void
 }) {
-  // Evento sem link não leva a lugar nenhum (não há página de detalhe para eventos)
-  const clickable = ed.tipo === 'edicao' || !!ed.link
+  const clickable = true // edições e eventos têm página própria
   const d = ed.data ? parseLocalDate(ed.data) : null
   const MESES_ABREV_LOCAL = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
   const diasSemanaAbrev = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB']
@@ -295,7 +294,7 @@ function EventCard({ ed, fmtDate, onClick }: {
         )}
       </div>
 
-      {clickable && <div className="cal-event-arrow">{ed.tipo === 'evento' ? '↗' : '›'}</div>}
+      {clickable && <div className="cal-event-arrow">›</div>}
     </div>
   )
 }
