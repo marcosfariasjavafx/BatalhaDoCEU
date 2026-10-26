@@ -134,17 +134,38 @@ create policy "mcs_read"    on public.mcs     for select using (true);
 create policy "edicoes_read" on public.edicoes for select using (true);
 create policy "fotos_read"  on public.fotos   for select using (true);
 
--- Escrita apenas para admins autenticados
-create policy "mcs_write"    on public.mcs     for all using (auth.role() = 'authenticated');
-create policy "edicoes_write" on public.edicoes for all using (auth.role() = 'authenticated');
-create policy "fotos_write"  on public.fotos   for all using (auth.role() = 'authenticated');
+-- Administradores: só quem está em public.admins pode escrever (estar logado não basta).
+-- Para dar acesso: insert into public.admins (user_id) select id from auth.users where email = '...';
+create table if not exists public.admins (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.admins enable row level security;
+create policy "admins_self_read" on public.admins
+  for select to authenticated using (user_id = (select auth.uid()));
+
+create or replace function public.is_admin() returns boolean
+language sql stable set search_path = ''
+as $$ select exists (select 1 from public.admins where user_id = (select auth.uid())) $$;
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+
+-- Escrita apenas para administradores
+do $$
+declare t text;
+begin
+  foreach t in array array['mcs','edicoes','eventos','fotos'] loop
+    execute format('create policy %I on public.%I for insert to authenticated with check ((select public.is_admin()))', t || '_insert', t);
+    execute format('create policy %I on public.%I for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()))', t || '_update', t);
+    execute format('create policy %I on public.%I for delete to authenticated using ((select public.is_admin()))', t || '_delete', t);
+  end loop;
+end $$;
 
 create policy "eventos_read"  on public.eventos for select using (true);
-create policy "eventos_write" on public.eventos for all using (auth.role() = 'authenticated');
 
 create policy "configuracoes_read"   on public.configuracoes for select using (true);
-create policy "configuracoes_insert" on public.configuracoes for insert to authenticated with check (true);
-create policy "configuracoes_update" on public.configuracoes for update to authenticated using (true) with check (true);
+create policy "configuracoes_insert" on public.configuracoes for insert to authenticated with check ((select public.is_admin()));
+create policy "configuracoes_update" on public.configuracoes for update to authenticated using ((select public.is_admin())) with check ((select public.is_admin()));
 
 -- Pontuação automática ligada por padrão
 insert into public.configuracoes (chave, valor)
@@ -182,12 +203,12 @@ create policy "storage_read"
   using (bucket_id in ('fotos','banners','avatares'));
 
 create policy "storage_write"
-  on storage.objects for insert
-  with check (bucket_id in ('fotos','banners','avatares') and auth.role() = 'authenticated');
+  on storage.objects for insert to authenticated
+  with check (bucket_id in ('fotos','banners','avatares') and (select public.is_admin()));
 
 create policy "storage_delete"
-  on storage.objects for delete
-  using (bucket_id in ('fotos','banners','avatares') and auth.role() = 'authenticated');
+  on storage.objects for delete to authenticated
+  using (bucket_id in ('fotos','banners','avatares') and (select public.is_admin()));
 
 -- ============================================================
 -- SEED — Dados iniciais

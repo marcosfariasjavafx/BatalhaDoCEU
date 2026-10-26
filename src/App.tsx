@@ -49,11 +49,11 @@ export default function App() {
           <Route path="/calendario" element={<><Navbar /><Calendario /></>} />
           <Route path="/eventos/:id" element={<><Navbar /><EventoDetalhe /></>} />
 
-          {/* Login admin — sem layout */}
-          <Route path="/admin/login" element={<><Navbar /><Login /></>} />
+          {/* Painel admin: separado do site público (sem Navbar pública, sem link no menu) */}
+          <Route path="/admin/login" element={<Login />} />
 
           {/* Admin protegido */}
-          <Route path="/admin" element={<><Navbar /><AdminLayout /></>}>
+          <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="mcs" element={<AdminMCs />} />
             <Route path="edicoes" element={<AdminEdicoes />} />

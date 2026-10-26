@@ -92,14 +92,6 @@ a { text-decoration: none; color: inherit; }
 .nav-links li a:hover, .nav-links li a.active,
 .nav-links li button:hover, .nav-links li button.active { color: var(--Y); background: rgba(245,200,66,.05); }
 .nav-right { display: flex; align-items: center; gap: .75rem; }
-#nav-admin-btn {
-  font-family: var(--FC); font-size: .75rem; font-weight: 700;
-  letter-spacing: .12em; text-transform: uppercase;
-  background: var(--Y); color: var(--P); border: none;
-  padding: 6px 14px; cursor: pointer; transition: background .2s;
-  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
-}
-#nav-admin-btn:hover { background: var(--YD); }
 .nav-hamburger { display: none; background: none; border: none; color: var(--W); font-size: 1.4rem; cursor: pointer; }
 .nav-mobile-menu {
   display: none; position: fixed; top: 54px; left: 0; right: 0; bottom: 0;
@@ -834,7 +826,6 @@ footer { background: var(--P2); border-top: 1px solid var(--B); padding: 2.5rem 
   .page-wrap { padding: 2rem 1rem; }
   .hero h1 { font-size: clamp(3.6rem, 17vw, 5rem); }
   .nav-logo img { height: 28px !important; }
-  #nav-admin-btn { display: none; }
   .rank-item { grid-template-columns: 30px 36px 1fr auto; }
 }
 

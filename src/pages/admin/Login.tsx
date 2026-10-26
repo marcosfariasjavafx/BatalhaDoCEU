@@ -1,8 +1,10 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useNoIndex } from './useNoIndex'
 
 export default function Login() {
+  useNoIndex()
   const nav = useNavigate()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')

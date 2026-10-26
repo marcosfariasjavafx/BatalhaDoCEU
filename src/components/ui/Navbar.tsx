@@ -35,7 +35,6 @@ export function Navbar() {
           ))}
         </ul>
         <div className="nav-right">
-          <button id="nav-admin-btn" onClick={() => go('/admin')}>⚙ Admin</button>
           <button
             className="nav-hamburger"
             onClick={() => setOpen(!open)}
@@ -51,7 +50,6 @@ export function Navbar() {
         {links.map(l => (
           <button key={l.path} className="nav-mobile-link" onClick={() => go(l.path)}>{l.label}</button>
         ))}
-        <button className="nav-mobile-link" onClick={() => go('/admin')}>⚙ Admin</button>
       </div>
     </>
   )
