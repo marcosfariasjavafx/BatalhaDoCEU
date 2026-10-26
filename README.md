@@ -1,125 +1,122 @@
-# 🎤 Batalha do Céu
+# Batalha do Céu
 
-Site + painel admin do evento de batalha de MCs de Santa Bárbara d'Oeste.
+Plataforma web para o movimento de batalhas de MCs de Santa Bárbara d'Oeste (SP), com páginas públicas para acompanhar MCs, rankings, edições e galeria, além de um painel administrativo.
 
-**Stack:** React 18 · TypeScript · Vite · Supabase · React Router v6
+## Tecnologias
 
----
-
-## Setup em 5 passos
-
-### 1. Criar projeto no Supabase
-
-- Acesse [supabase.com](https://supabase.com) → **New Project**
-- Aguarde provisionar (~1 min)
-
-### 2. Rodar o SQL
-
-No Supabase → **SQL Editor** → cole e execute o arquivo:
-
-```
-supabase/schema.sql
-```
-
-Isso cria as tabelas, RLS, Realtime, buckets de Storage e **12 MCs + 7 edições** de seed.
-
-### 3. Criar usuário admin
-
-Supabase → **Authentication → Users → Add User**
-- Informe email e senha (serão usados no login do painel)
-
-### 4. Configurar variáveis
-
-```bash
-cp .env.example .env
-```
-
-Edite `.env` com os valores do seu projeto (Supabase → **Settings → API**):
-
-```env
-VITE_SUPABASE_URL=https://SEU_PROJECT_ID.supabase.co
-VITE_SUPABASE_ANON_KEY=sua_anon_key_aqui
-```
-
-### 5. Instalar e rodar
-
-```bash
-npm install
-npm run dev
-```
-
-Acesse [http://localhost:5173](http://localhost:5173)
-
----
-
-## Estrutura
-
-```
-src/
-├── pages/
-│   ├── Home.tsx            # Home com próxima edição, MCs e ranking
-│   ├── MCs.tsx             # Grid de todos os MCs
-│   ├── MCPerfil.tsx        # Perfil individual com edições participadas
-│   ├── Ranking.tsx         # Ranking completo por pontos
-│   ├── Edicoes.tsx         # Listagem de todas as edições
-│   ├── EdicaoDetalhe.tsx   # Detalhe + bracket + fotos
-│   ├── Galeria.tsx         # Galeria com lightbox e filtro por edição
-│   ├── Sobre.tsx           # Sobre o movimento
-│   ├── Contato.tsx         # Contato e redes sociais
-│   └── admin/
-│       ├── Login.tsx       # Login via Supabase Auth
-│       ├── AdminLayout.tsx # Sidebar + proteção de rota
-│       ├── Dashboard.tsx   # Visão geral e atalhos
-│       ├── AdminMCs.tsx    # CRUD de MCs + upload de foto
-│       ├── AdminEdicoes.tsx# CRUD de edições + upload de banner
-│       ├── AdminBracket.tsx# Bracket com Realtime ao vivo
-│       └── AdminGaleria.tsx# Upload múltiplo de fotos
-│
-├── components/
-│   ├── ui/
-│   │   ├── Navbar.tsx
-│   │   ├── Footer.tsx
-│   │   └── MCAvatar.tsx
-│   └── public/
-│       └── BracketView.tsx
-│
-├── hooks/
-│   ├── useAuth.tsx   # Contexto de autenticação
-│   └── useToast.tsx  # Sistema de notificações
-│
-├── lib/
-│   ├── supabase.ts   # Cliente Supabase
-│   └── utils.ts      # Helpers + upload + compressão
-│
-├── types/index.ts    # Tipos TypeScript
-├── App.tsx           # Rotas
-├── main.tsx          # Entry point
-└── index.css         # CSS global (design tokens)
-```
-
----
+- React 18
+- TypeScript
+- Vite
+- React Router 6
+- Supabase (banco de dados, autenticação, Storage e Realtime)
 
 ## Funcionalidades
 
-| Área | Recursos |
-|------|----------|
-| **Público** | Home, MCs, Ranking, Edições+Bracket, Galeria, Sobre, Contato |
-| **Auth** | Login/logout via Supabase Auth, rota admin protegida |
-| **CRUD MCs** | Criar, editar, excluir + upload de foto comprimida |
-| **CRUD Edições** | Criar, editar, excluir + upload de banner |
-| **Bracket** | Geração aleatória (8 ou 16 MCs), clique no vencedor, campeão automático (+100 pts +1 título) |
-| **Realtime** | Bracket atualiza ao vivo para todos os admins conectados |
-| **Galeria** | Upload múltiplo, compressão automática, filtro por edição, lightbox |
+### Área pública
+- Página inicial com informações sobre o evento
+- Listagem e perfil dos MCs
+- Ranking por pontuação
+- Listagem e detalhes das edições
+- Chaves de batalha (bracket)
+- Galeria de fotos com filtro por edição e visualização ampliada
+- Páginas Sobre e Contato
 
----
+### Painel administrativo
+- Login e logout com Supabase Auth
+- Rotas administrativas protegidas
+- Cadastro, edição e exclusão de MCs
+- Cadastro, edição e exclusão de edições
+- Upload de fotos de MCs, banners e imagens da galeria
+- Gerenciamento de chaves e registro de vencedores
+- Atualizações em tempo real do bracket para administradores conectados
 
-## Deploy (Vercel)
+## Requisitos
+
+- Node.js e npm
+- Projeto Supabase
+- Conta Vercel (opcional, para deploy)
+
+## Configuração local
+
+1. Clone o repositório e entre na pasta do projeto:
+
+   ```bash
+   git clone https://github.com/marcosfariasjavafx/BatalhaDoCEU.git
+   cd BatalhaDoCEU
+   ```
+
+2. Instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+3. Crie um arquivo `.env` a partir do exemplo:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Preencha as variáveis com os dados do seu projeto Supabase, disponíveis em **Settings → API**:
+
+   ```env
+   VITE_SUPABASE_URL=https://SEU_PROJECT_ID.supabase.co
+   VITE_SUPABASE_ANON_KEY=SUA_CHAVE_ANON
+   ```
+
+   Não envie o arquivo `.env` nem chaves secretas para o GitHub. Use somente as credenciais apropriadas para o cliente web e mantenha as políticas de segurança (RLS) configuradas no Supabase.
+
+4. Configure o banco de dados no Supabase executando o script `supabase/schema.sql` pelo **SQL Editor**, caso esse script corresponda à versão atual do projeto.
+
+5. Inicie o servidor de desenvolvimento:
+
+   ```bash
+   npm run dev
+   ```
+
+   O Vite exibirá o endereço local, normalmente `http://localhost:5173`.
+
+## Scripts disponíveis
+
+| Comando | Descrição |
+| --- | --- |
+| `npm run dev` | Inicia o servidor de desenvolvimento |
+| `npm run build` | Executa a verificação TypeScript e gera a build de produção |
+| `npm run preview` | Serve localmente a build gerada para conferência |
+
+Para validar a build antes de publicar:
 
 ```bash
-npm i -g vercel
-vercel
+npm run build
+npm run preview
 ```
 
-Configure as variáveis de ambiente no painel da Vercel:
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_ANON_KEY`
+## Estrutura principal
+
+```
+src/
+├── components/    # Componentes reutilizáveis e da interface pública
+├── hooks/         # Hooks, incluindo autenticação e notificações
+├── lib/           # Cliente Supabase e utilitários
+├── pages/         # Páginas públicas e painel administrativo
+├── types/         # Tipos TypeScript
+├── App.tsx        # Rotas da aplicação
+├── main.tsx       # Ponto de entrada
+└── index.css      # Estilos globais
+supabase/
+└── schema.sql     # Estrutura e configuração inicial do banco
+```
+
+## Deploy na Vercel
+
+1. Importe o repositório no painel da Vercel.
+2. Configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY) nas variáveis de ambiente do projeto.
+3. Execute o deploy usando as configurações padrão do Vite.
+4. Confira a build e teste as rotas públicas e administrativas após a publicação.
+
+## Observações de segurança
+
+- O painel administrativo deve permanecer protegido por autenticação.
+- Configure e revise as políticas de Row Level Security (RLS) e as permissões dos buckets no Supabase.
+- Nunca publique senhas, tokens de serviço ou chaves privadas.
+- Tornar o repositório privado não torna automaticamente privado o site já publicado nem remove cópias ou histórico previamente acessíveis.
