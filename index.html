@@ -10,10 +10,20 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" href="/assets/Telgra.otf" as="font" type="font/otf" crossorigin />
+    <link rel="preload" href="/assets/feed/feed_00.webp" as="image" type="image/webp" />
+    <!-- Fontes do Google carregam sem bloquear a renderização (font-display: swap) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Barlow:wght@400;500;600&display=swap"
       rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Barlow:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Barlow:wght@400;500;600&display=swap" />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

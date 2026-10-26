@@ -23,7 +23,7 @@ export function Navbar() {
     <>
       <nav id="nav">
         <div className="nav-logo" onClick={() => go('/')}>
-          <img src="/assets/logo-branco.png" alt="Batalha do Céu" style={{ height: 34, width: 'auto', objectFit: 'contain' }} />
+          <img src="/assets/logo-branco.png" alt="Batalha do Céu" width={34} height={34} style={{ height: 34, width: 'auto', objectFit: 'contain' }} />
         </div>
         <ul className="nav-links">
           {links.map(l => (

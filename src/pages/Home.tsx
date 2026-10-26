@@ -10,16 +10,16 @@ import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import type { MC, Edicao, Evento } from '../types'
 
 const FEED_IMAGES = [
-  '/assets/feed/feed_00.jpg',
-  '/assets/feed/feed_01.jpg',
-  '/assets/feed/feed_02.jpg',
-  '/assets/feed/feed_03.jpg',
-  '/assets/feed/feed_04.jpg',
-  '/assets/feed/feed_05.jpg',
-  '/assets/feed/feed_06.jpg',
-  '/assets/feed/feed_07.jpg',
-  '/assets/feed/feed_08.jpg',
-  '/assets/feed/feed_09.jpg',
+  '/assets/feed/feed_00.webp',
+  '/assets/feed/feed_01.webp',
+  '/assets/feed/feed_02.webp',
+  '/assets/feed/feed_03.webp',
+  '/assets/feed/feed_04.webp',
+  '/assets/feed/feed_05.webp',
+  '/assets/feed/feed_06.webp',
+  '/assets/feed/feed_07.webp',
+  '/assets/feed/feed_08.webp',
+  '/assets/feed/feed_09.webp',
 ]
 
 export default function Home() {
@@ -55,9 +55,12 @@ export default function Home() {
         setEventos(futuros.slice(0, 3))
         setEventosPassados(passados.slice(0, 6))
       })
-    supabase.from('mcs').select('*').order('pontos', { ascending: false }).limit(6).then(({ data }) => setMCs(data ?? []))
-    supabase.from('mcs').select('*').order('pontos', { ascending: false }).then(({ data }) => setAllMcs(data ?? []))
-    supabase.from('mcs').select('*').order('pontos', { ascending: false }).limit(5).then(({ data }) => setRanking(data ?? []))
+    // Uma única consulta de MCs (já ordenada por pontos): Top MCs, ranking e ticker saem dela
+    supabase.from('mcs').select('*').order('pontos', { ascending: false })
+      .then(({ data }) => {
+        const todos = (data ?? []) as MC[]
+        setAllMcs(todos); setMCs(todos.slice(0, 6)); setRanking(todos.slice(0, 5))
+      })
     supabase.from('edicoes').select('*').in('status', ['confirmada', 'em-breve']).order('data').limit(1)
       .then(({ data }) => setNextEd(data?.[0] ?? null))
     supabase.from('edicoes').select('*, campeao:campeao_id(*)').eq('status', 'encerrada')
@@ -154,7 +157,7 @@ export default function Home() {
                 return (
                   <div key={ev.id} className="ed-card" style={{ cursor: 'default' }}>
                     <div className="ed-card-banner">
-                      {ev.banner_url ? <img src={ev.banner_url} alt="" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
+                      {ev.banner_url ? <img src={ev.banner_url} alt="" loading="lazy" decoding="async" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
                       <span className={`status-pill ${statusClass(ev.status)}`}>{statusLabel(ev.status)}</span>
                     </div>
                     <div className="ed-card-body">
@@ -232,7 +235,7 @@ export default function Home() {
             {encerradas.map((ed, idx) => (
               <div key={ed.id} className="ed-card" onClick={() => go(`/edicoes/${ed.id}`)}>
                 <div className="ed-card-banner">
-                  {ed.banner_url ? <img src={ed.banner_url} alt="" /> : <div className="ed-card-banner-ph">BDC</div>}
+                  {ed.banner_url ? <img src={ed.banner_url} alt="" loading="lazy" decoding="async" /> : <div className="ed-card-banner-ph">BDC</div>}
                   <span className={`status-pill ${statusClass(ed.status)}`}>{statusLabel(ed.status)}</span>
                 </div>
                 <div className="ed-card-body">
@@ -266,7 +269,7 @@ export default function Home() {
                 return (
                   <div key={ev.id} className="ed-card" style={{ cursor: 'default' }}>
                     <div className="ed-card-banner">
-                      {ev.banner_url ? <img src={ev.banner_url} alt="" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
+                      {ev.banner_url ? <img src={ev.banner_url} alt="" loading="lazy" decoding="async" /> : <div className="ed-card-banner-ph">{categoriaIcon(ev.categoria)}</div>}
                       <span className={`status-pill ${statusClass('encerrada')}`}>{statusLabel('encerrada')}</span>
                     </div>
                     <div className="ed-card-body">

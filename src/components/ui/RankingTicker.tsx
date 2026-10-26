@@ -36,7 +36,7 @@ export function RankingTicker({ mcs }: Props) {
                 {/* Avatar */}
                 <div className="ticker-avatar" style={{ background: `${col}20`, borderColor: `${col}50` }}>
                   {mc.foto_url
-                    ? <img src={mc.foto_url} alt={mc.nome} />
+                    ? <img src={mc.foto_url} alt={mc.nome} loading="lazy" decoding="async" />
                     : <span style={{ fontFamily: 'var(--FD)', fontSize: '1rem', color: col }}>{ini}</span>
                   }
                 </div>

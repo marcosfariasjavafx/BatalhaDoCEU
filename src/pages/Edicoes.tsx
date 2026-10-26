@@ -31,7 +31,7 @@ export default function Edicoes() {
                 return (
                   <div key={ed.id} className="ed-card" onClick={() => { nav(`/edicoes/${ed.id}`); window.scrollTo(0, 0) }}>
                     <div className="ed-card-banner">
-                      {ed.banner_url ? <img src={ed.banner_url} alt="" /> : <div className="ed-card-banner-ph">BDC{String(num).padStart(2, '0')}</div>}
+                      {ed.banner_url ? <img src={ed.banner_url} alt="" loading="lazy" decoding="async" /> : <div className="ed-card-banner-ph">BDC{String(num).padStart(2, '0')}</div>}
                       <span className={`status-pill ${statusClass(ed.status)}`}>{statusLabel(ed.status)}</span>
                     </div>
                     <div className="ed-card-body">

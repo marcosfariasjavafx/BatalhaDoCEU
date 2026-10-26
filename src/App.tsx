@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './hooks/useAuth'
 import { ToastProvider } from './hooks/useToast'
@@ -5,30 +6,31 @@ import { Navbar } from './components/ui/Navbar'
 
 // Páginas públicas
 import Home from './pages/Home'
-import MCs from './pages/MCs'
-import MCPerfil from './pages/MCPerfil'
-import Ranking from './pages/Ranking'
-import Edicoes from './pages/Edicoes'
-import EdicaoDetalhe from './pages/EdicaoDetalhe'
-import Galeria from './pages/Galeria'
-import Sobre from './pages/Sobre'
-import Contato from './pages/Contato'
-import Calendario from './pages/Calendario'
+const MCs = lazy(() => import('./pages/MCs'))
+const MCPerfil = lazy(() => import('./pages/MCPerfil'))
+const Ranking = lazy(() => import('./pages/Ranking'))
+const Edicoes = lazy(() => import('./pages/Edicoes'))
+const EdicaoDetalhe = lazy(() => import('./pages/EdicaoDetalhe'))
+const Galeria = lazy(() => import('./pages/Galeria'))
+const Sobre = lazy(() => import('./pages/Sobre'))
+const Contato = lazy(() => import('./pages/Contato'))
+const Calendario = lazy(() => import('./pages/Calendario'))
 
 // Admin
-import Login from './pages/admin/Login'
-import AdminLayout from './pages/admin/AdminLayout'
-import Dashboard from './pages/admin/Dashboard'
-import AdminMCs from './pages/admin/AdminMCs'
-import AdminEdicoes from './pages/admin/AdminEdicoes'
-import AdminBracket from './pages/admin/AdminBracket'
-import AdminGaleria from './pages/admin/AdminGaleria'
-import AdminPontuacao from './pages/admin/AdminPontuacao'
+const Login = lazy(() => import('./pages/admin/Login'))
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout'))
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'))
+const AdminMCs = lazy(() => import('./pages/admin/AdminMCs'))
+const AdminEdicoes = lazy(() => import('./pages/admin/AdminEdicoes'))
+const AdminBracket = lazy(() => import('./pages/admin/AdminBracket'))
+const AdminGaleria = lazy(() => import('./pages/admin/AdminGaleria'))
+const AdminPontuacao = lazy(() => import('./pages/admin/AdminPontuacao'))
 
 export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
+        <Suspense fallback={<div style={{ minHeight: '60vh' }} />}>
         <Routes>
           {/* Rotas públicas — todas com Navbar */}
           <Route
@@ -58,6 +60,7 @@ export default function App() {
             <Route path="galeria" element={<AdminGaleria />} />
           </Route>
         </Routes>
+        </Suspense>
       </ToastProvider>
     </AuthProvider>
   )

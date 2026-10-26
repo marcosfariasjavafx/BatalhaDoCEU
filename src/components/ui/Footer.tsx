@@ -5,7 +5,7 @@ export function Footer() {
     <footer>
       <div>
         <div className="ft-logo" style={{ marginBottom: '.5rem' }}>
-          <img src="/assets/logo-branco.png" alt="Batalha do Céu" style={{ height: 48, width: 'auto' }} />
+          <img src="/assets/logo-branco.png" alt="Batalha do Céu" width={48} height={48} loading="lazy" decoding="async" style={{ height: 48, width: "auto" }} />
         </div>
         <div className="ft-copy">
           {CIDADE} · Brasil<br />

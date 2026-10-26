@@ -11,7 +11,7 @@ export function MCAvatar({ id, nome, fotoUrl, size = 72 }: Props) {
       style={{ width: size, height: size, background: `${col}18`, borderColor: `${col}33` }}
     >
       {fotoUrl
-        ? <img src={fotoUrl} alt={nome} />
+        ? <img src={fotoUrl} alt={nome} loading="lazy" decoding="async" />
         : <span style={{ fontFamily: 'var(--FD)', fontSize: size * 0.3, color: col }}>{ini}</span>
       }
     </div>
