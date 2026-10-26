@@ -91,6 +91,7 @@ export interface Evento {
 export interface Foto {
   id: string
   edicao_id: string | null
+  evento_id?: string | null
   url: string
   nome: string | null
   created_at?: string

@@ -79,10 +79,14 @@ create table if not exists public.eventos (
 create table if not exists public.fotos (
   id         uuid primary key default uuid_generate_v4(),
   edicao_id  uuid references public.edicoes(id) on delete set null,
+  evento_id  uuid references public.eventos(id) on delete set null,
   url        text not null,
   nome       text,
   created_at timestamptz not null default now()
 );
+
+-- Fotos podem pertencer a uma edição ou a um evento
+create index if not exists fotos_evento_id_idx on public.fotos(evento_id);
 
 -- Configurações gerais do site (ex.: liga/desliga da pontuação automática)
 create table if not exists public.configuracoes (

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { Footer } from '../components/ui/Footer'
-import type { Foto, Edicao } from '../types'
+import type { Foto, Edicao, Evento } from '../types'
 
 export default function Galeria() {
   const [fotos, setFotos] = useState<Foto[]>([])
   const [edicoes, setEdicoes] = useState<Pick<Edicao, 'id' | 'titulo'>[]>([])
+  const [eventos, setEventos] = useState<Pick<Evento, 'id' | 'titulo'>[]>([])
   const [filtro, setFiltro] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -14,15 +15,21 @@ export default function Galeria() {
     Promise.all([
       supabase.from('fotos').select('*').order('created_at', { ascending: false }),
       supabase.from('edicoes').select('id,titulo').order('data', { ascending: false }),
-    ]).then(([{ data: f }, { data: e }]) => {
+      supabase.from('eventos').select('id,titulo').order('data', { ascending: false }),
+    ]).then(([{ data: f }, { data: e }, { data: ev }]) => {
       setFotos(f ?? [])
       setEdicoes(e ?? [])
+      setEventos(ev ?? [])
       setLoading(false)
     })
   }, [])
 
-  const exibidas = filtro ? fotos.filter(f => f.edicao_id === filtro) : fotos
-  const comFotos = edicoes.filter(e => fotos.some(f => f.edicao_id === e.id))
+  // Filtros de edições e eventos que têm fotos (ids são uuids, não se repetem entre as tabelas)
+  const exibidas = filtro ? fotos.filter(f => f.edicao_id === filtro || f.evento_id === filtro) : fotos
+  const comFotos = [
+    ...edicoes.filter(e => fotos.some(f => f.edicao_id === e.id)),
+    ...eventos.filter(e => fotos.some(f => f.evento_id === e.id)),
+  ]
 
   return (
     <div className="wrap">

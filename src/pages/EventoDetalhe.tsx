@@ -4,19 +4,23 @@ import { supabase } from '../lib/supabase'
 import { fmtData, statusClass, statusLabel } from '../lib/utils'
 import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import { Footer } from '../components/ui/Footer'
-import type { Evento } from '../types'
+import type { Evento, Foto } from '../types'
 
 export default function EventoDetalhe() {
   const { id } = useParams<{ id: string }>()
   const nav = useNavigate()
   const [ev, setEv] = useState<Evento | null>(null)
+  const [fotos, setFotos] = useState<Foto[]>([])
+  const [lightbox, setLightbox] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!id) { setLoading(false); return }
     setLoading(true)
-    supabase.from('eventos').select('*').eq('id', id).maybeSingle()
-      .then(({ data }) => { setEv((data as Evento) ?? null); setLoading(false) })
+    Promise.all([
+      supabase.from('eventos').select('*').eq('id', id).maybeSingle(),
+      supabase.from('fotos').select('*').eq('evento_id', id).order('created_at', { ascending: false }),
+    ]).then(([{ data }, { data: f }]) => { setEv((data as Evento) ?? null); setFotos(f ?? []); setLoading(false) })
   }, [id])
 
   // Título da aba do navegador acompanha o evento
@@ -84,7 +88,28 @@ export default function EventoDetalhe() {
             )}
           </div>
         </div>
+
+        {fotos.length > 0 && (
+          <div>
+            <div className="sec-label" style={{ marginBottom: '1rem' }}>Fotos</div>
+            <div className="galeria-grid">
+              {fotos.map(f => (
+                <div key={f.id} className="galeria-item" onClick={() => setLightbox(f.url)}>
+                  <img src={f.url} alt={f.nome ?? ''} loading="lazy" decoding="async" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      {lightbox && (
+        <div className="lightbox" onClick={() => setLightbox(null)}>
+          <img src={lightbox} className="lightbox-img" alt="" />
+          <button className="lightbox-close" onClick={() => setLightbox(null)}>✕</button>
+        </div>
+      )}
+
       <Footer />
     </div>
   )

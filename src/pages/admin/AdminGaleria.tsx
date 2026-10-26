@@ -2,23 +2,27 @@ import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabase'
 import { uploadFile, compressImage } from '../../lib/utils'
 import { useToast } from '../../hooks/useToast'
-import type { Foto, Edicao } from '../../types'
+import type { Foto, Edicao, Evento } from '../../types'
 
 export default function AdminGaleria() {
   const { show: toast } = useToast()
   const [fotos, setFotos] = useState<Foto[]>([])
   const [edicoes, setEdicoes] = useState<Pick<Edicao, 'id' | 'titulo'>[]>([])
-  const [selEdId, setSelEdId] = useState('')
+  const [eventos, setEventos] = useState<Pick<Evento, 'id' | 'titulo'>[]>([])
+  // Destino das fotos: '' (nenhum), 'ed:<id>' (edição) ou 'ev:<id>' (evento)
+  const [destino, setDestino] = useState('')
   const [uploading, setUploading] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const load = async () => {
-    const [fotosR, edsR] = await Promise.all([
+    const [fotosR, edsR, evsR] = await Promise.all([
       supabase.from('fotos').select('*').order('created_at', { ascending: false }),
       supabase.from('edicoes').select('id,titulo').order('data', { ascending: false }),
+      supabase.from('eventos').select('id,titulo').order('data', { ascending: false }),
     ])
     setFotos(fotosR.data ?? [])
     setEdicoes(edsR.data ?? [])
+    setEventos(evsR.data ?? [])
   }
 
   useEffect(() => { load() }, [])
@@ -31,7 +35,12 @@ export default function AdminGaleria() {
       for (const file of files) {
         const compressed = await compressImage(file, 900, 0.75)
         const url = await uploadFile(compressed, 'fotos')
-        await supabase.from('fotos').insert({ url, nome: file.name, edicao_id: selEdId || null })
+        const { error } = await supabase.from('fotos').insert({
+          url, nome: file.name,
+          edicao_id: destino.startsWith('ed:') ? destino.slice(3) : null,
+          evento_id: destino.startsWith('ev:') ? destino.slice(3) : null,
+        })
+        if (error) throw error
       }
       toast(`${files.length} foto(s) adicionada(s)!`)
       load()
@@ -41,6 +50,10 @@ export default function AdminGaleria() {
     setUploading(false)
     e.target.value = ''
   }
+
+  const rotulo = (f: Foto) =>
+    f.evento_id ? eventos.find(e => e.id === f.evento_id)?.titulo
+      : f.edicao_id ? edicoes.find(e => e.id === f.edicao_id)?.titulo : undefined
 
   async function handleDelete(foto: Foto) {
     if (!confirm('Remover esta foto?')) return
@@ -64,10 +77,19 @@ export default function AdminGaleria() {
       {/* Upload */}
       <div style={{ marginBottom: '2rem' }}>
         <div className="form-group" style={{ maxWidth: 360 }}>
-          <label className="form-label">Edição (opcional)</label>
-          <select className="form-select" value={selEdId} onChange={e => setSelEdId(e.target.value)}>
-            <option value="">Sem edição</option>
-            {edicoes.map(e => <option key={e.id} value={e.id}>{e.titulo}</option>)}
+          <label className="form-label">Edição ou evento (opcional)</label>
+          <select className="form-select" value={destino} onChange={e => setDestino(e.target.value)}>
+            <option value="">Sem vínculo</option>
+            {edicoes.length > 0 && (
+              <optgroup label="Edições">
+                {edicoes.map(e => <option key={e.id} value={`ed:${e.id}`}>{e.titulo}</option>)}
+              </optgroup>
+            )}
+            {eventos.length > 0 && (
+              <optgroup label="Eventos">
+                {eventos.map(e => <option key={e.id} value={`ev:${e.id}`}>{e.titulo}</option>)}
+              </optgroup>
+            )}
           </select>
         </div>
 
@@ -89,6 +111,7 @@ export default function AdminGaleria() {
           <div key={f.id} className="galeria-admin-item">
             <img src={f.url} alt={f.nome ?? ''} loading="lazy" />
             <button className="galeria-del" onClick={() => handleDelete(f)}>✕</button>
+            {rotulo(f) && <div className="galeria-tag">{rotulo(f)}</div>}
           </div>
         ))}
         {!fotos.length && <div className="aviso" style={{ gridColumn: '1/-1' }}>Nenhuma foto ainda. Faça upload acima.</div>}
