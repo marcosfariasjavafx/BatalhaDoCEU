@@ -141,6 +141,7 @@ create table if not exists public.admins (
   created_at timestamptz not null default now()
 );
 alter table public.admins enable row level security;
+revoke all on public.admins from anon;
 create policy "admins_self_read" on public.admins
   for select to authenticated using (user_id = (select auth.uid()));
 
