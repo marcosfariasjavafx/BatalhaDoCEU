@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { fmtData, statusClass, statusLabel } from '../lib/utils'
@@ -31,6 +31,9 @@ export default function Home() {
   const [ranking, setRanking] = useState<MC[]>([])
   const [edCount, setEdCount] = useState(0)
   const [slideIdx, setSlideIdx] = useState(0)
+  // Slides já exibidos: só eles (e o próximo) são carregados, em vez das 10 fotos de uma vez
+  const vistos = useRef<Set<number>>(new Set())
+  vistos.current.add(slideIdx)
   const [eventos, setEventos] = useState<Evento[]>([])
   const [eventosPassados, setEventosPassados] = useState<Evento[]>([])
 
@@ -84,12 +87,15 @@ export default function Home() {
       <section className="hero">
         {/* Slideshow background */}
         <div className="hero-slideshow">
-          {FEED_IMAGES.map((src, i) => (
-            <div key={src} className={`hero-slide${i === slideIdx ? ' active' : ''}`}>
-              <img src={src} alt="" loading={i === 0 ? 'eager' : 'lazy'} />
-              <div className="hero-slide-overlay" />
-            </div>
-          ))}
+          {FEED_IMAGES.map((src, i) => {
+            const proximo = i === (slideIdx + 1) % FEED_IMAGES.length
+            return (
+              <div key={src} className={`hero-slide${i === slideIdx ? ' active' : ''}`}>
+                {(vistos.current.has(i) || proximo) && <img src={src} alt="" decoding="async" />}
+                <div className="hero-slide-overlay" />
+              </div>
+            )
+          })}
         </div>
 
         <div className="hero-radial" />

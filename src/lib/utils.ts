@@ -61,10 +61,18 @@ export async function compressImage(file: File, maxW = 900, quality = 0.75): Pro
         canvas.width = Math.round(img.width * ratio)
         canvas.height = Math.round(img.height * ratio)
         canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
-        canvas.toBlob(
-          (blob) => blob ? resolve(new File([blob], file.name, { type: 'image/jpeg' })) : reject(new Error('Falha')),
-          'image/jpeg', quality
-        )
+        // WebP: mesma qualidade visual com ~30% menos bytes. Navegadores sem suporte
+        // devolvem outro formato no toBlob; nesse caso usamos JPEG.
+        const done = (blob: Blob | null) => {
+          if (!blob) return reject(new Error('Falha'))
+          const base = file.name.replace(/\.[^.]+$/, '')
+          const ext = blob.type === 'image/webp' ? 'webp' : 'jpg'
+          resolve(new File([blob], `${base}.${ext}`, { type: blob.type === 'image/webp' ? 'image/webp' : 'image/jpeg' }))
+        }
+        canvas.toBlob(blob => {
+          if (blob && blob.type === 'image/webp') done(blob)
+          else canvas.toBlob(done, 'image/jpeg', quality)
+        }, 'image/webp', Math.min(quality + 0.05, 0.9))
       }
       img.src = e.target?.result as string
     }
