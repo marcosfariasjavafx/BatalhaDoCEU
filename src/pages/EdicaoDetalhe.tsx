@@ -6,6 +6,7 @@ import { BracketView } from '../components/public/BracketView'
 import { Footer } from '../components/ui/Footer'
 import { ehCampeao, ehEquipe, equipeCampea, formatoLabel, tamanhoFormato } from '../lib/equipes'
 import type { Edicao, MC, Foto } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function EdicaoDetalhe() {
   const { id } = useParams<{ id: string }>()
@@ -32,6 +33,16 @@ export default function EdicaoDetalhe() {
       setLoading(false)
     })
   }, [id])
+
+  usePageMeta(ed ? {
+    title: ed.titulo,
+    description: [
+      ed.status === 'encerrada' ? 'Edição encerrada da Batalha do Céu' : 'Edição da Batalha do Céu',
+      [fmtData(ed.data) !== '—' ? fmtData(ed.data) : '', ed.local].filter(Boolean).join(' · '),
+      ed.descricao,
+    ].filter(Boolean).join(' — '),
+    image: ed.banner_url,
+  } : { title: 'Edição' })
 
   if (loading) return <div className="wrap"><div className="section"><div className="aviso">Carregando...</div></div></div>
   if (!ed) return <div className="wrap"><div className="section"><div className="aviso">Edição não encontrada.</div></div></div>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { Footer } from '../components/ui/Footer'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function Sobre() {
+  usePageMeta({ title: 'Sobre o projeto', description: "Conheça a história da Batalha do Céu, a batalha de MCs de Hip-Hop e freestyle de Santa Bárbara d'Oeste — SP, e a cultura de rua que ela une." })
   const [totalMCs, setTotalMCs] = useState(0)
   const [totalEnc, setTotalEnc] = useState(0)
   const [cidades, setCidades] = useState(0)

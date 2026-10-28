@@ -4,8 +4,10 @@ import { supabase } from '../lib/supabase'
 import { MCAvatar } from '../components/ui/MCAvatar'
 import { Footer } from '../components/ui/Footer'
 import type { MC } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function MCs() {
+  usePageMeta({ title: 'MCs', description: "Conheça os MCs que batalham na Batalha do Céu em Santa Bárbara d'Oeste — SP: perfis, pontos e títulos." })
   const nav = useNavigate()
   const [mcs, setMCs] = useState<MC[]>([])
   const [loading, setLoading] = useState(true)

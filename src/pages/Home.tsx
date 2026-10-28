@@ -8,6 +8,7 @@ import { RankingTicker } from '../components/ui/RankingTicker'
 import { ehEquipe, equipeCampea, formatoLabel } from '../lib/equipes'
 import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import type { MC, Edicao, Evento } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 const FEED_IMAGES = [
   '/assets/feed/feed_00.webp',
@@ -23,6 +24,7 @@ const FEED_IMAGES = [
 ]
 
 export default function Home() {
+  usePageMeta({ title: "Batalha do Céu — Batalha de MCs em Santa Bárbara d'Oeste", completo: true })
   const nav = useNavigate()
   const [mcs, setMCs] = useState<MC[]>([])
   const [allMcs, setAllMcs] = useState<MC[]>([])

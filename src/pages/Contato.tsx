@@ -3,8 +3,10 @@ import {
   ENDERECO, ENDERECO_CURTO, CIDADE, MAPS_URL, MAPS_EMBED_URL,
   INSTAGRAM_URL, INSTAGRAM_HANDLE, WHATSAPP_URL, YOUTUBE_URL,
 } from '../lib/links'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function Contato() {
+  usePageMeta({ title: 'Contato e localização', description: "Fale com a Batalha do Céu pelo WhatsApp ou Instagram e veja o endereço dos eventos em Santa Bárbara d'Oeste — SP." })
   const infos = [
     { icon: '📍', label: 'Local dos Eventos', val: ENDERECO, href: MAPS_URL },
     { icon: '📸', label: 'Instagram', val: INSTAGRAM_HANDLE, href: INSTAGRAM_URL },

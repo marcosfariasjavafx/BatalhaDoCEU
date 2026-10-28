@@ -5,6 +5,7 @@ import { MCAvatar } from '../components/ui/MCAvatar'
 import { Footer } from '../components/ui/Footer'
 import { ehCampeao } from '../lib/equipes'
 import type { MC, Edicao } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function MCPerfil() {
   const { id } = useParams<{ id: string }>()
@@ -27,6 +28,12 @@ export default function MCPerfil() {
       setLoading(false)
     })
   }, [id])
+
+  usePageMeta(mc ? {
+    title: mc.nome,
+    description: `${mc.nome}${mc.cidade ? `, de ${mc.cidade},` : ''} MC da Batalha do Céu: ${mc.pontos} pontos no ranking e ${mc.titulos} título${mc.titulos === 1 ? '' : 's'}.${mc.bio ? ' ' + mc.bio : ''}`,
+    image: mc.foto_url,
+  } : { title: 'MC' })
 
   if (loading) return <div className="wrap"><div className="section"><div className="aviso">Carregando...</div></div></div>
   if (!mc) return <div className="wrap"><div className="section"><div className="aviso">MC não encontrado.</div></div></div>

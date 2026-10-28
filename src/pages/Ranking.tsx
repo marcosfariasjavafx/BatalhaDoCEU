@@ -4,8 +4,10 @@ import { supabase } from '../lib/supabase'
 import { MCAvatar } from '../components/ui/MCAvatar'
 import { Footer } from '../components/ui/Footer'
 import type { MC } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function Ranking() {
+  usePageMeta({ title: 'Ranking de MCs', description: 'Ranking oficial da Batalha do Céu: os MCs com mais pontos e títulos nas batalhas de freestyle.' })
   const nav = useNavigate()
   const [mcs, setMCs] = useState<MC[]>([])
   const [loading, setLoading] = useState(true)

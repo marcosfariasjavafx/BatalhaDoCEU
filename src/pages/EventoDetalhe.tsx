@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 import { fmtData, statusClass, statusLabel } from '../lib/utils'
 import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import { Footer } from '../components/ui/Footer'
+import { usePageMeta } from '../lib/pageMeta'
 import type { Evento, Foto } from '../types'
 
 export default function EventoDetalhe() {
@@ -23,13 +24,15 @@ export default function EventoDetalhe() {
     ]).then(([{ data }, { data: f }]) => { setEv((data as Evento) ?? null); setFotos(f ?? []); setLoading(false) })
   }, [id])
 
-  // Título da aba do navegador acompanha o evento
-  useEffect(() => {
-    if (!ev) return
-    const antes = document.title
-    document.title = `${ev.titulo} — Batalha do Céu`
-    return () => { document.title = antes }
-  }, [ev])
+  usePageMeta(ev ? {
+    title: ev.titulo,
+    description: [
+      `${categoriaLabel(ev.categoria)} da Batalha do Céu`,
+      [fmtData(ev.data) !== '—' ? fmtData(ev.data) : '', ev.horario, ev.local].filter(Boolean).join(' · '),
+      ev.descricao,
+    ].filter(Boolean).join(' — '),
+    image: ev.banner_url,
+  } : { title: 'Evento' })
 
   const voltar = () => { nav('/calendario'); window.scrollTo(0, 0) }
 

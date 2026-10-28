@@ -5,10 +5,12 @@ import { fmtData, statusClass, statusLabel } from '../lib/utils'
 import { Footer } from '../components/ui/Footer'
 import { ehEquipe, equipeCampea, formatoLabel } from '../lib/equipes'
 import type { Edicao, MC } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 type EdicaoWithCamp = Edicao & { campeao?: MC | null }
 
 export default function Edicoes() {
+  usePageMeta({ title: 'Edições', description: "Todas as edições da Batalha do Céu: datas, locais, campeões e chaveamentos das batalhas de MCs em Santa Bárbara d'Oeste — SP." })
   const nav = useNavigate()
   const [edicoes, setEdicoes] = useState<EdicaoWithCamp[]>([])
   const [loading, setLoading] = useState(true)

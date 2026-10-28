@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { Footer } from '../components/ui/Footer'
 import type { Foto, Edicao, Evento } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 export default function Galeria() {
+  usePageMeta({ title: 'Galeria de fotos', description: 'Fotos das edições e eventos da Batalha do Céu: MCs, público e os melhores momentos das batalhas.' })
   const [fotos, setFotos] = useState<Foto[]>([])
   const [edicoes, setEdicoes] = useState<Pick<Edicao, 'id' | 'titulo'>[]>([])
   const [eventos, setEventos] = useState<Pick<Evento, 'id' | 'titulo'>[]>([])

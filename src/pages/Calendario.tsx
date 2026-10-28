@@ -5,6 +5,7 @@ import { statusClass, statusLabel } from '../lib/utils'
 import { Footer } from '../components/ui/Footer'
 import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import type { Edicao, Evento, EdicaoStatus, EventoCategoria } from '../types'
+import { usePageMeta } from '../lib/pageMeta'
 
 /** Item da agenda: uma edição de batalha ou um evento (show, breakdance...) */
 interface AgendaItem {
@@ -40,6 +41,7 @@ function parseLocalDate(s: string) {
 }
 
 export default function Calendario() {
+  usePageMeta({ title: 'Calendário de eventos', description: "Próximas batalhas, shows e eventos da Batalha do Céu em Santa Bárbara d'Oeste — SP." })
   const nav = useNavigate()
   const today = new Date()
   const [year, setYear]   = useState(today.getFullYear())
