@@ -67,3 +67,59 @@ export function usePageMeta({ title, description, image, completo }: PageMeta) {
     return () => { document.title = antesTitulo; undo.forEach(fn => fn()) }
   }, [title, description, image, completo, pathname])
 }
+
+/** Insere dados estruturados (JSON-LD) na página enquanto ela estiver aberta. */
+export function useJsonLd(data: object | null) {
+  const json = data ? JSON.stringify(data) : ''
+  useEffect(() => {
+    if (!json) return
+    const s = document.createElement('script')
+    s.type = 'application/ld+json'
+    s.text = json
+    document.head.appendChild(s)
+    return () => { s.remove() }
+  }, [json])
+}
+
+/** "20h", "20h30", "19:00 às 23h" → "20:00" (primeiro horário encontrado). */
+function horaIso(horario: string | null | undefined): string | null {
+  const m = (horario ?? '').match(/(\d{1,2})\s*(?:h|:)\s*(\d{2})?/i)
+  if (!m || +m[1] > 23) return null
+  return `${m[1].padStart(2, '0')}:${(m[2] ?? '00')}`
+}
+
+interface EventoLd {
+  nome: string
+  data: string | null
+  horario?: string | null
+  local?: string | null
+  /** Endereço usado quando `local` não é preenchido. */
+  enderecoPadrao: string
+  descricao?: string | null
+  imagem?: string | null
+  encerrado?: boolean
+}
+
+/** Dados de Event (schema.org) para o Google mostrar data, local e nome nos resultados. */
+export function eventoJsonLd(e: EventoLd): object | null {
+  if (!e.data) return null // sem data o Google não aceita o evento
+  const hora = horaIso(e.horario)
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Event',
+    name: e.nome,
+    startDate: hora ? `${e.data}T${hora}:00-03:00` : e.data,
+    eventStatus: 'https://schema.org/EventScheduled',
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    location: {
+      '@type': 'Place',
+      name: e.local || SITE,
+      address: e.local
+        ? { '@type': 'PostalAddress', streetAddress: e.local, addressLocality: "Santa Bárbara d'Oeste", addressRegion: 'SP', addressCountry: 'BR' }
+        : { '@type': 'PostalAddress', streetAddress: e.enderecoPadrao, addressLocality: "Santa Bárbara d'Oeste", addressRegion: 'SP', addressCountry: 'BR' },
+    },
+    ...(e.descricao ? { description: resumo(e.descricao, 300) } : {}),
+    ...(e.imagem ? { image: [e.imagem] } : {}),
+    organizer: { '@type': 'Organization', name: SITE, url: window.location.origin },
+  }
+}

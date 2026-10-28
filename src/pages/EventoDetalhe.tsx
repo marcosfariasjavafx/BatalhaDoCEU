@@ -4,7 +4,8 @@ import { supabase } from '../lib/supabase'
 import { fmtData, statusClass, statusLabel } from '../lib/utils'
 import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import { Footer } from '../components/ui/Footer'
-import { usePageMeta } from '../lib/pageMeta'
+import { usePageMeta, useJsonLd, eventoJsonLd } from '../lib/pageMeta'
+import { ENDERECO_CURTO } from '../lib/links'
 import type { Evento, Foto } from '../types'
 
 export default function EventoDetalhe() {
@@ -33,6 +34,11 @@ export default function EventoDetalhe() {
     ].filter(Boolean).join(' — '),
     image: ev.banner_url,
   } : { title: 'Evento' })
+
+  useJsonLd(ev ? eventoJsonLd({
+    nome: ev.titulo, data: ev.data, horario: ev.horario, local: ev.local,
+    enderecoPadrao: ENDERECO_CURTO, descricao: ev.descricao, imagem: ev.banner_url,
+  }) : null)
 
   const voltar = () => { nav('/calendario'); window.scrollTo(0, 0) }
 

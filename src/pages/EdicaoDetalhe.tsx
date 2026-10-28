@@ -6,7 +6,8 @@ import { BracketView } from '../components/public/BracketView'
 import { Footer } from '../components/ui/Footer'
 import { ehCampeao, ehEquipe, equipeCampea, formatoLabel, tamanhoFormato } from '../lib/equipes'
 import type { Edicao, MC, Foto } from '../types'
-import { usePageMeta } from '../lib/pageMeta'
+import { usePageMeta, useJsonLd, eventoJsonLd } from '../lib/pageMeta'
+import { ENDERECO_CURTO } from '../lib/links'
 
 export default function EdicaoDetalhe() {
   const { id } = useParams<{ id: string }>()
@@ -43,6 +44,11 @@ export default function EdicaoDetalhe() {
     ].filter(Boolean).join(' — '),
     image: ed.banner_url,
   } : { title: 'Edição' })
+
+  useJsonLd(ed ? eventoJsonLd({
+    nome: ed.titulo, data: ed.data, horario: ed.horario, local: ed.local,
+    enderecoPadrao: ENDERECO_CURTO, descricao: ed.descricao, imagem: ed.banner_url,
+  }) : null)
 
   if (loading) return <div className="wrap"><div className="section"><div className="aviso">Carregando...</div></div></div>
   if (!ed) return <div className="wrap"><div className="section"><div className="aviso">Edição não encontrada.</div></div></div>
