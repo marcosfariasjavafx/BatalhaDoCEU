@@ -9,6 +9,8 @@ import { ehEquipe, equipeCampea, formatoLabel } from '../lib/equipes'
 import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import type { MC, Edicao, Evento } from '../types'
 import { usePageMeta } from '../lib/pageMeta'
+import { Contagem } from '../components/public/Contagem'
+import { EventoAcoes } from '../components/public/EventoAcoes'
 
 const FEED_IMAGES = [
   '/assets/feed/feed_00.webp',
@@ -142,11 +144,13 @@ export default function Home() {
                 <div>
                   <div className="sec-label">{statusLabel(nextEd.status)}</div>
                   <div style={{ fontFamily: 'var(--FD)', fontSize: '2rem', textTransform: 'uppercase', lineHeight: 1, marginBottom: '1.2rem' }}>{nextEd.titulo}</div>
+                  <Contagem data={nextEd.data} horario={nextEd.horario} />
                   {nextEd.data && <div className="detail-item"><div className="detail-icon">📅</div><div><div className="detail-label">Data</div><div className="detail-val">{fmtData(nextEd.data)}</div></div></div>}
                   {nextEd.horario && <div className="detail-item"><div className="detail-icon">⏰</div><div><div className="detail-label">Horário</div><div className="detail-val">{nextEd.horario}</div></div></div>}
                   {nextEd.local && <div className="detail-item"><div className="detail-icon">📍</div><div><div className="detail-label">Local</div><div className="detail-val">{nextEd.local}</div></div></div>}
+                  <EventoAcoes evento={{ titulo: nextEd.titulo, data: nextEd.data, horario: nextEd.horario, local: nextEd.local, descricao: nextEd.descricao, path: `/edicoes/${nextEd.id}` }} />
                 </div>
-                <button className="btn btn-y" onClick={() => go(`/edicoes/${nextEd.id}`)}>Ver Detalhes</button>
+                <button className="btn btn-y" style={{ marginTop: '1.2rem' }} onClick={() => go(`/edicoes/${nextEd.id}`)}>Ver Detalhes</button>
               </div>
             </div>
           ) : <div className="aviso">Nenhuma edição programada no momento.</div>}

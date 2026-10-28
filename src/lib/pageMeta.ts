@@ -82,7 +82,7 @@ export function useJsonLd(data: object | null) {
 }
 
 /** "20h", "20h30", "19:00 às 23h" → "20:00" (primeiro horário encontrado). */
-function horaIso(horario: string | null | undefined): string | null {
+export function horaIso(horario: string | null | undefined): string | null {
   const m = (horario ?? '').match(/(\d{1,2})\s*(?:h|:)\s*(\d{2})?/i)
   if (!m || +m[1] > 23) return null
   return `${m[1].padStart(2, '0')}:${(m[2] ?? '00')}`

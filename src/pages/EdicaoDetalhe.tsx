@@ -8,6 +8,8 @@ import { ehCampeao, ehEquipe, equipeCampea, formatoLabel, tamanhoFormato } from 
 import type { Edicao, MC, Foto } from '../types'
 import { usePageMeta, useJsonLd, eventoJsonLd } from '../lib/pageMeta'
 import { ENDERECO_CURTO } from '../lib/links'
+import { Contagem } from '../components/public/Contagem'
+import { EventoAcoes } from '../components/public/EventoAcoes'
 
 export default function EdicaoDetalhe() {
   const { id } = useParams<{ id: string }>()
@@ -93,6 +95,8 @@ export default function EdicaoDetalhe() {
                     : `Batalha de ${formatoLabel(ed.formato)} · ${ed.limite} MCs · Eliminação Simples`)
                 : `${ed.limite} MCs · Eliminação Simples`}
             </div></div></div>
+            {ed.status !== 'encerrada' && <Contagem data={ed.data} horario={ed.horario} />}
+            <EventoAcoes encerrado={ed.status === 'encerrada'} evento={{ titulo: ed.titulo, data: ed.data, horario: ed.horario, local: ed.local, descricao: ed.descricao, path: `/edicoes/${ed.id}` }} />
           </div>
           <div>
             {ed.descricao && <p style={{ fontFamily: 'var(--FC)', fontSize: '.95rem', color: 'var(--W2)', lineHeight: 1.75, marginBottom: '1.25rem' }}>{ed.descricao}</p>}

@@ -6,6 +6,8 @@ import { categoriaIcon, categoriaLabel, linkSeguro } from '../lib/eventos'
 import { Footer } from '../components/ui/Footer'
 import { usePageMeta, useJsonLd, eventoJsonLd } from '../lib/pageMeta'
 import { ENDERECO_CURTO } from '../lib/links'
+import { Contagem } from '../components/public/Contagem'
+import { EventoAcoes } from '../components/public/EventoAcoes'
 import type { Evento, Foto } from '../types'
 
 export default function EventoDetalhe() {
@@ -86,6 +88,8 @@ export default function EventoDetalhe() {
               </div></div>
             )}
             <div className="detail-item"><div className="detail-icon">{categoriaIcon(ev.categoria)}</div><div><div className="detail-label">Tipo</div><div className="detail-val">{categoriaLabel(ev.categoria)}</div></div></div>
+            {!encerrado && <Contagem data={ev.data} horario={ev.horario} />}
+            <EventoAcoes encerrado={encerrado} evento={{ titulo: ev.titulo, data: ev.data, horario: ev.horario, local: ev.local, descricao: ev.descricao, path: `/eventos/${ev.id}` }} />
           </div>
           <div>
             {ev.descricao && <p style={{ fontFamily: 'var(--FC)', fontSize: '.95rem', color: 'var(--W2)', lineHeight: 1.75, marginBottom: '1.25rem', whiteSpace: 'pre-line' }}>{ev.descricao}</p>}
